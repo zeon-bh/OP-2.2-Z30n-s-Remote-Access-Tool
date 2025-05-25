@@ -1,0 +1,55 @@
+<w>
+  	<main_dialog>
+		<dialog x="266" y="80" width="415" height="502" stretch="1">
+			<texture>ui_menu_options_dlg</texture>
+		</dialog>
+
+		<capt x="100" y="10" width="170" height="25">
+			<text align="c" font="graffiti22" r="238" g="153" b="26">"Remote Access Tool"</text>
+		</capt>
+
+		<msg1 x="73" y="40" width="100" height="25">
+			<text font="graffiti22" r="238" g="153" b="26">"Linked Stashes"</text>
+		</msg1>
+
+		<tele_uses x="300" y="40" width="120" height="25">
+			<text font="graffiti22" r="238" g="153" b="26" complex_mode="1" align="l" vert_align="t"/>
+		</tele_uses>
+
+		<list_frame x="63" y="60" width="332" height="378" stretch="1">
+			<texture>ui_tablist_textbox</texture>
+		</list_frame>
+
+		<list x="73" y="70" width="312" height="350" item_height="18"/>
+
+		<btn_rename x="52" y="440" width="110" height="29">
+			<text x="2" y="2" align="c" font="graffiti22" r="238" g="153" b="26">"Rename Stash"</text>	
+			<texture>ui_button_ordinary</texture>
+		</btn_rename>
+
+		<btn_ok x="169" y="440" width="110" height="29">
+			<text x="2" y="2" align="c" font="graffiti22" r="238" g="153" b="26">"Open Stash"</text>	
+			<texture>ui_button_ordinary</texture>			
+		</btn_ok>
+
+		<btn_quit x="285" y="440" width="110" height="29">
+			<text x="2" y="2" align="c" font="graffiti22" r="238" g="153" b="26">ui_inv_cancel</text>	
+			<texture>ui_button_ordinary</texture>			
+		</btn_quit>
+	</main_dialog>
+
+	<stash_preview_panel x="667" y="1" width="360" height="767" stretch="1">
+		<texture>ui_tablist_textbox</texture>
+
+		<stash_content_caption x="0" y="5" width="350" height="20">
+			<text font="graffiti19" r="225" g="225" b="250" align="c">"Linked Stash Contents"</text>
+		</stash_content_caption>
+
+		<stash_content_scroll_area x="0" y="25" width="350" height="735" always_show_scroll="1">
+			<stash_text_content x="5" y="5" width="330" height="1500">
+				<text font="letterica18" r="200" g="200" b="200" complex_mode="1" align="c" vert_align="t" />
+			</stash_text_content>
+		</stash_content_scroll_area>
+
+	</stash_preview_panel>
+</w>

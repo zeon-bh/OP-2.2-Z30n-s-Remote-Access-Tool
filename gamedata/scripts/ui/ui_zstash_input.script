@@ -1,0 +1,89 @@
+------ Text Box CUI class ------
+
+class "ZStashInputDialog" (CUIScriptWnd)
+function ZStashInputDialog:__init(prompt_text, current_text, object_id, rename_stash, parent_class) super()
+	self.prompt_text = prompt_text
+	self.current_text = current_text
+	self.enter_pressed_in_editbox = false
+	self.current_stash_id = object_id
+	self.rename_stash = rename_stash
+	self.parent_class = parent_class or nil
+
+	self:InitControls()
+	self:InitCallBacks()
+	self.caption_static:SetText(self.prompt_text)
+	if self.rename_stash then self.edit_box:SetText(self.current_text) end
+end
+
+function ZStashInputDialog:InitControls()
+	self:Init(0,0,1024,768)
+	self:Enable(true)
+	self:SetAutoDelete(true)
+
+	local xml = CScriptXmlInit()
+	xml:ParseFile("ui_zstash_textbox.xml")
+
+	self.dialog_frame = xml:InitStatic("custom_input_box:dialog", self) -- The main frame from XML
+
+	self.caption_static = xml:InitStatic("custom_input_box:caption", self.dialog_frame)
+	self.edit_box = xml:InitEditBox("custom_input_box:edit_box", self.dialog_frame)
+	self.btn_ok = xml:Init3tButton("custom_input_box:btn_ok", self.dialog_frame)
+	self.btn_cancel = xml:Init3tButton("custom_input_box:btn_cancel", self.dialog_frame)
+
+	self:Register(self.btn_ok, "btn_ok_input")
+	self:Register(self.btn_cancel, "btn_cancel_input")
+	-- Important for keyboard input to the edit box
+	self:Register(self.edit_box, "edit_box_input")
+end
+
+function ZStashInputDialog:InitCallBacks()
+	self:AddCallback("btn_ok_input", ui_events.BUTTON_CLICKED, self.OnButton_OK_Clicked, self)
+	self:AddCallback("btn_cancel_input", ui_events.BUTTON_CLICKED, self.OnButton_Cancel_Clicked, self)
+	-- Allow Enter key to submit from edit box
+	self:AddCallback("edit_box_input", ui_events.EDIT_TEXT_COMMIT, 
+			function() 
+				self.enter_pressed_in_editbox = true
+			end, 
+		self)
+end
+
+function ZStashInputDialog:OnButton_OK_Clicked()
+	local entered_text = self.edit_box:GetText()
+	self:GetHolder():start_stop_menu(self, true) -- Close this dialog
+	if self.rename_stash then
+		zstash_logic.ProcessStashRenameInputSpot(entered_text, self.current_stash_id)
+		if self.parent_class then
+			self.parent_class:UpdateList()
+		end
+	else
+		zstash_logic.ProcessStashNameInput(entered_text, true, self.current_stash_id) -- Pass text and success flag
+	end
+end
+
+function ZStashInputDialog:OnButton_Cancel_Clicked()
+	self:GetHolder():start_stop_menu(self, true) -- Close this dialog
+	if not self.rename_stash then
+		zstash_logic.ProcessStashNameInput(nil, false, self.current_stash_id) -- Pass nil and failure/cancel flag
+	end
+end
+
+function ZStashInputDialog:OnKeyboard(dik, keyboard_action)
+	CUIScriptWnd.OnKeyboard(self, dik, keyboard_action)
+	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
+		if dik == DIK_keys.DIK_ESCAPE then
+			self:OnButton_Cancel_Clicked()
+		elseif dik == DIK_keys.DIK_RETURN then
+			self:OnButton_OK_Clicked()
+		end
+	end
+	return true -- Consume input
+end
+
+function ZStashInputDialog:Update()
+    CUIScriptWnd.Update(self) -- Call superclass update
+
+    if self.enter_pressed_in_editbox then
+        self.enter_pressed_in_editbox = false -- Reset flag
+        self:OnButton_OK_Clicked()
+    end
+end

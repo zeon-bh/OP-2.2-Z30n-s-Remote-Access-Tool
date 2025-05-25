@@ -1,0 +1,483 @@
+-- ������������ ����
+class "StashData" (CUIListItemEx)
+
+local def_color={255,216,186,140}
+local sel_color={255,0,150,100}
+local cur_color={255,255,0,0}
+
+local DEPLETE_RATE = 0.07 -- Decrease by 7% after every use
+local TELEPORT_SAFETY_THRESHOLD = 1 -- Limit at which Teleport artifacts cannot be used for opening remote stashes
+
+local debug = true
+function debug_log(str,...)
+	if debug then
+		log("Z Remote Stash:debug: "..str,...)
+	end
+end
+
+function StashData:__init(sdata) super()
+	self:SetWndRect(0,0,430,22)
+	self.fn	= CUIStatic()
+	self.fn:SetAutoDelete(true)
+	self:AttachChild(self.fn)
+	self.fn:SetWndRect(0,0,200,22)
+	self.fn:SetFont(GetFontLetterica18Russian())
+	self.fn:SetTextColor(unpack(def_color))
+	self.stash_name = sdata.stash_name
+	self.fn:SetText(translate(self.stash_name))
+	self.sid = sdata.stash_id
+	if safe_StealManager.GetStealManagerClass():IsStolen(self.sid) then
+		self.fn:SetTextColor(unpack(cur_color))
+	end
+end
+
+class "ZStashMenu" (CUIScriptWnd)
+
+function ZStashMenu:__init() super()
+	self:InitControls()
+	self:InitCallBacks()
+	self.stash_list = nil
+	self:InitStashList()
+	self:FillList()
+	self.last_select_item = nil
+	self.teleport_artifacts = nil
+	self:InitTeleport()
+end
+
+function ZStashMenu:InitStashList()
+	local cur_stash_list = table.load("saved_stashes")
+	local new_stash_list = {}
+
+	-- Check if stashes are valid
+	for _,v in pairs(cur_stash_list) do
+		local test_storage_id = "storage_" .. v.stash_id
+		local stash_id_valid = keyvals("storages"):get(test_storage_id, nil)
+
+		-- Ignore all the invalid ids [Most likely the stash was removed by the player]
+		if stash_id_valid and server_object(v.stash_id) then
+			table.insert(new_stash_list,v)
+		end
+	end
+
+	table.save("saved_stashes", new_stash_list)
+	self.stash_list = new_stash_list
+end
+
+-- Fill out all the saved player stashes into the list Window 
+function ZStashMenu:FillList()
+	local list_box = self:GetListWnd("list_window")
+	local s_itm
+
+	if table.size(self.stash_list)>1 then
+		table.sort(self.stash_list,function(a,b) return a.stash_name < b.stash_name end)
+	end
+
+	for _,v in pairs(self.stash_list) do
+		s_itm = StashData(v)
+		list_box:AddItem(s_itm)
+	end
+end
+
+function ZStashMenu:InitControls()
+	self:Init(0,0,1024,768)
+	
+	-- ����-��������� ����� ���������
+	local xml = CScriptXmlInit()
+	xml:ParseFile("ui_zstash.xml")
+
+	self.dialog	= xml:InitStatic("main_dialog:dialog", self)
+	xml:InitStatic("main_dialog:capt", self.dialog)
+	xml:InitStatic("main_dialog:msg1", self.dialog)
+	self.tele_uses = xml:InitStatic("main_dialog:tele_uses", self.dialog)
+
+	-- Preview list window
+	self.stash_preview_panel = xml:InitFrame("stash_preview_panel", self)
+	self.stash_preview_panel.stash_content_caption = xml:InitStatic("stash_preview_panel:stash_content_caption", self.stash_preview_panel)
+	self.stash_preview_panel.stash_content_scroll_area  = xml:InitScrollView("stash_preview_panel:stash_content_scroll_area", self.stash_preview_panel)
+	self.stash_preview_panel.stash_text_content = xml:InitStatic("stash_preview_panel:stash_content_scroll_area:stash_text_content", self.stash_preview_panel.stash_content_scroll_area)
+	self.stash_preview_panel.stash_text_content:SetText("") -- Clear it initially
+	self.stash_preview_panel:Show(false) -- Hide the preview window untill a stash name has been selected
+
+	-- Button Inits
+	self.ok_rename=xml:Init3tButton("main_dialog:btn_rename", self.dialog)
+	self:Register(self.ok_rename,"btn_rename")
+	self.ok_rename:Enable(true)
+	self.ok_btn=xml:Init3tButton("main_dialog:btn_ok", self.dialog)
+	self:Register(self.ok_btn,"btn_ok")
+	self.ok_btn:Enable(true)
+	self:Register(xml:Init3tButton("main_dialog:btn_quit", self.dialog),"btn_quit")
+	xml:InitFrame("main_dialog:list_frame", self.dialog)
+	self.ctrl = xml:InitList("main_dialog:list", self.dialog)
+	self.ctrl:Enable(true)
+	self.ctrl:ShowSelectedItem(true)
+	self:Register(self.ctrl, "list_window")
+end
+
+function ZStashMenu:InitCallBacks()
+	self:AddCallback("btn_rename", ui_events.BUTTON_CLICKED, self.on_rename, self)
+	self:AddCallback("btn_ok", ui_events.BUTTON_CLICKED, self.on_ok, self)
+	self:AddCallback("btn_quit", ui_events.BUTTON_CLICKED, self.on_cancel, self)
+	self:AddCallback("list_window", ui_events.LIST_ITEM_CLICKED, self.ItemClicked, self)
+end
+
+function ZStashMenu:ItemClicked()
+	if self.last_select_item then
+		if safe_StealManager.GetStealManagerClass():IsStolen(self.last_select_item.sid) then
+			self.last_select_item.fn:SetTextColor(unpack(cur_color))
+		else
+        	self.last_select_item.fn:SetTextColor(unpack(def_color))
+		end
+	end
+	local selectedIndex=self.ctrl:GetSelectedItem()
+
+	if selectedIndex == -1 then
+        self.last_select_item = nil
+        return
+    end
+
+    local selectedItemUI = self.ctrl:GetItem(selectedIndex) -- stashdata UI instance
+    if selectedItemUI then
+        self.last_select_item = selectedItemUI
+		if safe_StealManager.GetStealManagerClass():IsStolen(selectedItemUI.sid) then
+			selectedItemUI.fn:SetTextColor(unpack(cur_color))
+		else
+        	selectedItemUI.fn:SetTextColor(unpack(sel_color))
+		end
+
+        -- Generate and set the preview text
+        if selectedItemUI.sid then -- 'sid' holds the stash object_id
+            local preview_str = self:GenerateStashPreview(selectedItemUI.sid)
+
+			self.stash_preview_panel.stash_text_content:SetText(preview_str)
+			self.stash_preview_panel.stash_content_scroll_area:ScrollToBegin() -- Scroll to top after updating
+        else
+            self.stash_preview_panel.stash_text_content:SetText("Error: Stash ID not found for preview.")
+        end
+    else
+        self.stash_preview_panel.stash_text_content:SetText("") -- Clear preview if item is somehow nil
+    end
+	-- Display the preview panel after selecting an item from the stash list window
+	self.stash_preview_panel:Show(true)
+end
+
+-- Generates a list of items for all the linked stashes in a large preview window - Modified safe_storageviewer:CloseViewer()
+function ZStashMenu:GenerateStashPreview(stash_object_id)
+    local storage_id_key = "storage_" .. stash_object_id
+    local stash_data = keyvals("storages"):get(storage_id_key, nil)
+    local show_item_weight = false
+
+    if not stash_data or table.size(stash_data) == 0 then
+        return translate("Remote Linked Stash is Empty!!!") -- Or "Stash is empty"
+    end
+
+    local systemIniReader = ini_reader.iniReader()
+    local skip_begin_words = { -- Copied from StorageViewer
+        translate("ui_skip_ammo_word"),
+        translate("ui_skip_grenade_word"),
+        translate("ui_skip_silencer_word"),
+        translate("ui_skip_scope_word"),
+        translate("ui_skip_box_word")
+    }
+
+    local totalSpotTexts = {}
+    local totalWeight = 0
+    local totalCount = 0
+
+    for itype, tbl in pairs(stash_data) do
+        local unSortedSection = {}
+        if tbl then
+            for index, data in pairs(tbl) do
+                if data.section then
+                    local descFromIni = systemIniReader:readTranslatedString(data.section, "inv_name")
+                    local item_weight = systemIniReader:readFloat(data.section, "inv_weight", 0)
+                    local current_item_total_weight = item_weight * (data.params.count or 1)
+
+                    if not descFromIni then descFromIni = "Unknown: " .. data.section end
+
+                    if unSortedSection[descFromIni] then
+                        local currentDesc = unSortedSection[descFromIni]
+                        unSortedSection[descFromIni] = {
+                            count = currentDesc.count + (data.params.count or 1),
+                            weight = currentDesc.weight + current_item_total_weight
+                        }
+                    else
+                        unSortedSection[descFromIni] = {
+                            count = (data.params.count or 1),
+                            weight = current_item_total_weight
+                        }
+                    end
+                    totalCount = totalCount + (data.params.count or 1)
+                    totalWeight = totalWeight + current_item_total_weight
+                end
+            end
+            totalSpotTexts[itype] = unSortedSection
+        end
+    end
+
+    local getTypeColor = function(itemType) -- Copied from StorageViewer
+        if itemType==1 then return "%c[254,243,122,11]"
+        elseif itemType==2 then return "%c[254,129,129,11]"
+        elseif itemType==3 then return "%c[208,100,100,255]"
+        elseif itemType==4 then return "%c[100,200,200,1]"
+        elseif itemType==5 then return "%c[0,128,64,1]"
+        elseif itemType==6 then return "%c[128,128,192,1]"
+        elseif itemType==7 then return "%c[207,255,085,085]"
+        elseif itemType==8 then return "%c[50,1,150,1]"
+        elseif itemType==9 then return "%c[208,100,100,255]"
+        else return "%c[default]" end
+    end
+
+    local spotText = ""
+    local delimiterSection = ", " -- For items within a type
+    local delimiterTotal = "\\n\\n"   -- For separating types (use \\n for newline in complex_mode)
+
+    for item_type_index, unsortedSpotTexts in table.spairs(totalSpotTexts) do
+        local stripped = {}
+        local current_type_text_parts = {} -- To build text for this type
+
+        for desc, params in table.spairs(unsortedSpotTexts) do
+            local weightText = ""
+            local part = "unstripped"
+            if show_item_weight and params.weight > 0 then
+                weightText = string.format("%.2f%s", params.weight, translate("ui_inv_aw_kg"))
+            end
+
+            for __, sw in ipairs(skip_begin_words) do
+                local spart = utf8.sub(desc, 1, utf8.len(sw))
+                if utf8.ncasecmp(spart, sw) == 0 then
+                    desc = utf8.sub(desc, utf8.len(sw) + 2, utf8.len(desc))
+                    part = spart
+                    break -- Found a prefix, no need to check others
+                end
+            end
+
+            local item_display_text
+            if params.count > 1 then
+                item_display_text = string.format("%s (%i%s", desc, params.count, (weightText ~= "" and " "..weightText..")" or ")"))
+            else
+                item_display_text = string.format("%s%s", desc, (weightText ~= "" and " ("..weightText..")" or ""))
+            end
+
+            if not stripped[part] then stripped[part] = {} end
+            table.insert(stripped[part], item_display_text)
+        end
+
+        local type_header_text = translate("txt_safe_filter_" .. item_type_index) -- Get filter name for type
+        if type_header_text == ("txt_safe_filter_" .. item_type_index) then -- If no translation
+            type_header_text = "Type " .. item_type_index
+        end
+
+		local built_text_for_this_type = string.format("%s<< %s >>%s \\n" ,getTypeColor(item_type_index),string.upper(type_header_text),getTypeColor(0))
+
+        local parts_count = 0
+        for part, tbl_txt in table.spairs(stripped) do
+			parts_count = parts_count + 1
+			local txt_section = ""
+			for i, txt in ipairs(tbl_txt) do
+				if i == 1 then
+					txt_section = (part ~= "unstripped" and (part .. ":") or "") .. txt -- Indent items
+				else
+					txt_section = txt_section .. delimiterSection .. txt
+				end
+			end
+		    built_text_for_this_type = string.format("%s%s%s \\n\\n\\n", built_text_for_this_type,txt_section,getTypeColor(0))
+        end
+
+        if parts_count > 0 then -- Only add if this type had items
+            if spotText ~= "" then
+                spotText = spotText .. built_text_for_this_type
+            else
+                spotText = built_text_for_this_type
+            end
+        end
+    end
+
+    if spotText == "" then
+        return translate("txt_safe_empty_storage")
+    else
+        local header = string.format("%s %s %s, %.2f %s.\\n\\n",
+                                translate("ui_storage_total"),
+                                totalCount,
+                                translate("ui_storage_items"),
+                                totalWeight,
+                                translate("ui_inv_aw_kg"))
+        return header .. spotText
+    end
+end
+
+function ZStashMenu:OnKeyboard(dik, keyboard_action)
+	CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
+	if keyboard_action == ui_events.WINDOW_KEY_PRESSED then
+		if dik == DIK_keys.DIK_ESCAPE then
+			self:on_cancel()
+		end
+		if dik == DIK_keys.DIK_RETURN then
+			self:on_ok()
+		end
+	end
+	return true
+end
+
+-- Rename Linked Stashes
+function ZStashMenu:on_rename()
+	local list = self:GetListWnd("list_window")	
+	if list:GetSize()==0 then return end
+	local index = list:GetSelectedItem()
+	if index == -1 then return end
+	local item=list:GetItem(index)
+
+	if not item or not item.sid then return end
+
+	-- Cannot Rename Stolen Stashes -- Ignore user click
+	if safe_StealManager.GetStealManagerClass():IsStolen(item.sid) then return end
+
+	-- Check if actor is in combat state
+	if db.actor:enemy_see_actor() then
+		local zstash_str = "%%c[0,255,0,1]REMOTE ACCESS TOOL%%c[default]: Cannot rename the remote stash during combat!"
+        local text_sms = string.extformat(translate(zstash_str))
+        sms(text_sms, nil, "nano", 5000)
+		self:on_quit()
+	end
+
+	-- Rename the stash
+	local current_name = item.stash_name
+	local input_dialog = ui_zstash_input.ZStashInputDialog("Rename the linked stash [" .. item.stash_name .."]:" , current_name, item.sid, true, self)
+    
+    local ir_wnd = level.main_input_receiver()
+    if ir_wnd then
+        ir_wnd:GetHolder():start_stop_menu(input_dialog, true)
+    else
+        level.start_stop_menu(input_dialog, true)
+    end
+end
+
+function ZStashMenu:on_ok()
+	local list = self:GetListWnd("list_window")	
+	if list:GetSize()==0 then return end
+	local index = list:GetSelectedItem()
+	if index == -1 then return end
+	local item=list:GetItem(index)
+
+	if not item or not item.sid then return end
+
+	-- Remote Access Tool Balance checks
+
+	-- Check if stash is stolen
+	if safe_StealManager.GetStealManagerClass():IsStolen(item.sid) then
+		local zstash_str = "%%c[0,255,0,1]REMOTE ACCESS TOOL%%c[default]: Cannot open the remote stash, Your Stash has been stolen and cannot be accessed until retrieved!"
+        local text_sms = string.extformat(translate(zstash_str))
+        sms(text_sms, nil, "nano", 5000)
+		self:on_quit()
+		return
+	end
+
+	-- Check if actor is in combat state
+	if db.actor:enemy_see_actor() then
+		local zstash_str = "%%c[0,255,0,1]REMOTE ACCESS TOOL%%c[default]: Cannot open the remote stash during combat!"
+        local text_sms = string.extformat(translate(zstash_str))
+        sms(text_sms, nil, "nano", 5000)
+		self:on_quit()
+	end
+
+	if table.size(self.teleport_artifacts.teleport) == 0 then
+		-- cannot open stash
+		local zstash_str = "%%c[0,255,0,1]REMOTE ACCESS TOOL%%c[default]: Cannot open the remote stash, no available teleport artifacts in the inventory!"
+        local text_sms = string.extformat(translate(zstash_str))
+        sms(text_sms, nil, "nano", 5000)
+		self:on_quit()
+	else
+		if self.teleport_artifacts.selected_artifact then
+			local artifact_obj = self.teleport_artifacts.selected_artifact.obj
+
+			-- Set the new Teleport artifact condition after use
+			artifact_obj:set_condition(artifact_obj:condition() - DEPLETE_RATE)
+			-- Start the remote stash session
+			self:on_quit()
+			zstash_remote_manager.OpenRemoteStashView(item.sid)
+		else
+			-- Teleport Artefacts have no charge left
+			local zstash_str = "%%c[0,255,0,1]REMOTE ACCESS TOOL%%c[default]: Cannot open the remote stash, The available Teleport Artifacts do not have sufficient charge to open a remote connection to the linked stash!"
+			local text_sms = string.extformat(translate(zstash_str))
+			sms(text_sms, nil, "nano", 5000)
+			self:on_quit()
+		end
+	end
+end
+
+-- Only to close UI to return to player inventory
+function ZStashMenu:on_cancel()
+	self:GetHolder():start_stop_menu(self, true)
+end
+
+function ZStashMenu:on_quit()
+	self:GetHolder():start_stop_menu(self, true)
+	level.start_stop_menu(level.main_input_receiver(), true) -- Closes the player invenotry as well
+end
+
+function ZStashMenu:UpdateList()
+	local list_box = self:GetListWnd("list_window")
+	list_box:RemoveAll()
+	self:InitStashList()
+	self:FillList() -- Refresh the stash list window
+end
+
+-- Check if a Teleport Artifact is present and select one with the lowest condition and condition > charge requirement
+function ZStashMenu:InitTeleport()
+	local teleport_artifacts = {
+		selected_artifact = nil,
+		teleport = {}
+	}
+	-- Convert teleport artifact condition charge to uses and use it directly to calculate total uses with safety threshold
+	db.actor:iterate_ruck(function(item)
+		if item then
+			if item:section() == "af_teleport" then
+				table.insert(teleport_artifacts.teleport, {uid = item:id(), uses = math.ceil(item:condition() / DEPLETE_RATE) - TELEPORT_SAFETY_THRESHOLD, obj = item})
+			end
+		end
+	end)
+
+	-- Sort table from least to maximum uses
+	table.sort(teleport_artifacts.teleport, function (a,b)
+			return a.uses < b.uses
+	end)
+
+	if debug then
+		for _,v in pairs(teleport_artifacts.teleport) do
+			debug_log("SORTED TABLE | Teleport UID = %d | Teleport Uses = %.2f", v.uid, v.uses)
+		end
+	end
+
+	-- Select the teleport artifact with lowest uses greater than TELEPORT_THRESHOLD and calculate total uses
+	local total_uses = 0
+	for _,art in pairs(teleport_artifacts.teleport) do
+		if art.uses > 0 and not teleport_artifacts.selected_artifact then -- If current artifact is depleted skip to next one
+			teleport_artifacts.selected_artifact = art
+			debug_log("SELECTED ARTIFACT | UID = %d | USES = %d", art.uid, art.uses)
+		end
+		total_uses = total_uses + art.uses
+	end
+
+	-- Set the header text in the menu to display teleport artifact total uses if available
+	local getTeleportText = function(total_uses)
+		local no_artifacts = "%c[0,255,0,1]N/A%c[default]" -- 0 Uses
+		local color_code = "[0,255,0,1]" -- RED
+        if total_uses then
+			if total_uses >= 11 then
+				color_code = "[0,0,255,1]" -- GREEN
+			end
+			if total_uses >= 6 and total_uses < 12 then
+				color_code = "[0,125,125,1]" -- Yellow
+			end
+		end
+		local condition_text = string.format("%%c%s%d%%c[default]", color_code, total_uses)
+		if table.size(teleport_artifacts.teleport) == 0 then
+			condition_text = no_artifacts
+		end
+        return string.extformat("Teleport Uses: %s", condition_text)
+    end
+
+	-- Display the total uses if availabe or N/A
+	self.tele_uses:SetText(getTeleportText(total_uses))
+
+	self.teleport_artifacts = teleport_artifacts
+end

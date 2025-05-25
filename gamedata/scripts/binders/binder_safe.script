@@ -1,0 +1,146 @@
+-- ���������������
+
+function init(obj) -- �������� �������
+	db.storage[obj:id()] = { }
+	local new_binder = SafeBinder(obj)
+	obj:bind_object(new_binder)
+end
+
+class "SafeBinder" (object_binder) --������
+function SafeBinder:__init(obj) super(obj)
+	self.storageID="storage_"..obj:id()
+	self.binderDataTable={}
+	self.classname="SafeBinder"
+	self.object:set_nonscript_usable(false)
+	self.storage_data=keyvals("storages"):get(self.storageID,{})
+	self.storage_config=keyvals("storages_config"):get(self.storageID,{})
+	if not self.storage_config.ui_tool then
+		self.storage_config.ui_tool="string_ui"
+	end
+end
+
+function SafeBinder:reinit()
+	object_binder.reinit(self)
+	db.storage[self.object:id()] = { }
+end
+
+function SafeBinder:update(delta)
+	object_binder.update(self, delta)
+end
+ 
+ function SafeBinder:set_usable()
+	self.object:set_tip_text(translate("st_search_treasure")) --� ����� � ��� ��� ��� O_PHYS_S ��������� ������ ��� ������� �� ����
+	self.object:set_callback(callback.use_object, SafeBinder.use_callback, self) --���� �������� ��� � reinit/init - �� ���������, � update ���� �� ������
+ end
+ 
+ function SafeBinder:set_unusable()
+	self.object:set_tip_text("")
+	self.object:set_callback(callback.use_object, nil)
+ end
+ 
+ 
+ function SafeBinder:net_spawn(data)
+	if not object_binder.net_spawn(self, data) then
+		return false
+	end
+	if safe_StealManager.GetStealManagerClass():IsStolen(self.object:id()) then --���� ������� - �� �� ���� ������� ������ � �����
+		self:set_unusable()
+	else
+		self:set_usable()
+	end
+	return true
+end
+
+function SafeBinder:net_destroy()
+	self.object:set_callback(callback.use_object, nil)
+	db.storage[self.object:id()] = nil
+	object_binder.net_destroy(self)
+end
+ 
+function SafeBinder:net_save_relevant()
+	return true
+end 
+
+function SafeBinder:save(packet) --��������� ������ � �������� �������
+	object_binder.save(self, packet)
+	-- for section,data in pairs(self.binderDataTable) do
+		-- packet:w_stringZ(section) --������ � ������� , ����������� '&'
+		-- packet:w_u8(data.itemsType) --���
+		-- packet:w_u16(data.count) --����������
+	-- end
+end
+
+function SafeBinder:load(reader) --������ ������ �� ��������� �������
+	object_binder.load(self, reader)
+	if not reader:r_eof() then
+		local section, it, cnt
+		while not reader:r_eof() do
+			section = reader:r_stringZ() --������ � ������� , ����������� '&'
+			it = reader:r_u8() --���
+			cnt = reader:r_u16() --����������
+			self.binderDataTable[section]={count=cnt,itemsType=it}  --�������� �������
+		end
+		for inputSection,params in pairs(self.binderDataTable) do
+			local amp_index=inputSection:find("&")
+			local item_section,item_condition
+			if amp_index then 
+				item_section=inputSection:sub(1,amp_index-1)
+				item_condition=tonumber(inputSection:sub(amp_index+1,inputSection:len()))
+			else
+				item_section=inputSection
+				item_condition=100
+			end
+			if not self.storage_data[params.itemsType] then
+				self.storage_data[params.itemsType]={}
+			end
+			self.storage_data[params.itemsType][generate_uuid()]=
+			{
+				["section"]=item_section,
+				["params"]={
+					["itype"]=params.itemsType,
+					["condition"]=item_condition,
+					["count"]=params.count
+				}
+			}
+		end
+		self.binderDataTable={}
+	end
+end
+
+function SafeBinder:change_tool_ui(current_tool)
+	current_tool:GetHolder():start_stop_menu(current_tool, true) --generate event WINDOW_STOP_DIALOG
+	self.storage_config.ui_tool="icon_ui"
+	self:use_callback(self.object,db.actor)
+end
+
+function SafeBinder:use_callback(obj, who)
+	if not safe_StealManager.GetStealManagerClass():IsStolen(self.object:id()) then --����� �� �� set_nonscript_usable, ������ ������ �������
+		local storageViewer
+
+		-- Z Stash add rucksack to z device if present in player's inventory
+		if zstash_logic.CheckZStashTool(self.object:id()) then return end -- Exit out of call back after open UI text dialog
+
+		if not self.storage_config.ui_tool then
+			storageViewer=safe_StorageViewer.StorageViewer(self)
+		else
+			if self.storage_config.ui_tool=="string_ui" then
+				storageViewer=safe_StorageViewer.StorageViewer(self)
+			elseif self.storage_config.ui_tool=="icon_ui" then
+				storageViewer=ui_storage_viewer.UIStorageViewer(self)
+			else
+				abort("! ERROR Unknown UI tool for open storage!")
+			end
+		end
+		local ir_wnd=level.main_input_receiver()
+	    if ir_wnd then 
+			ir_wnd:GetHolder():start_stop_menu(storageViewer,true)
+		else
+			level.start_stop_menu(storageViewer,true)
+		end
+	end
+end
+ 
+function SafeBinder:reload(section)
+	object_binder.reload(self, section)
+end
+

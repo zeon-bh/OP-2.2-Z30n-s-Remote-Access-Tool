@@ -1,0 +1,178 @@
+-- Z Stash Util Functions and definitions
+local original_StorageViewer_CloseViewer = nil
+working_zstash_id = nil
+
+local function CreateStashEntry(name, id)
+    return {
+        stash_name = name,
+        stash_id = id
+    }
+end
+
+-- Function to check whether player has the z stash tool and if stash is already added to the list
+function CheckZStashTool(new_stash_id)
+	local item_exists = false
+	db.actor:iterate_ruck(function(item)
+		if item then
+			if item:section() == "zstash" then
+				item_exists = true
+				return
+			end
+		end
+	end)
+
+	if not item_exists then return end
+
+	-- check if stash already added
+	if StashAlreadyAdded(new_stash_id) then 
+		-- If stash already added and player has zstash then update the mapspot link info
+		LinkMapSpot(new_stash_id)
+		return
+	end
+
+	-- If not added to the list start the Text UI window to get the stash name from player
+	AddStashToDevice(new_stash_id)
+	return true
+end
+
+-- Check if stash exists or not in the list
+function StashAlreadyAdded(zstash_id)
+	local s_list = table.load("saved_stashes") or {}
+	if table.size(s_list) > 0 then
+		for _,v in pairs(s_list) do
+			if v.stash_id == zstash_id then 
+				return true
+			end
+		end
+	end
+end
+
+-- Getters for Name and ID
+function GetStashName(zstash_id)
+	local s_list = table.load("saved_stashes") or {}
+	if table.size(s_list) > 0 then
+		for _,v in pairs(s_list) do
+			if v.stash_id == zstash_id then 
+				return v.stash_name
+			end
+		end
+	end
+end
+
+function GetStashID(zstash_name)
+	local s_list = table.load("saved_stashes") or {}
+	if table.size(s_list) > 0 then
+		for _,v in pairs(s_list) do
+			if v.stash_name == zstash_name then 
+				return v.stash_id
+			end
+		end
+	end
+end
+
+-- Function to call when you want to add/rename a stash
+function AddStashToDevice(new_zstash_id)
+    local current_name = level.name() .. " -- " .. tostring(new_zstash_id) -- Default initial name    
+
+    local input_dialog = ui_zstash_input.ZStashInputDialog("Remote Access Tool [Set Stash Name and Link]:", current_name, new_zstash_id, false)
+    
+    local ir_wnd = level.main_input_receiver()
+    if ir_wnd then
+        ir_wnd:GetHolder():start_stop_menu(input_dialog, true)
+    else
+        level.start_stop_menu(input_dialog, true)
+    end
+end
+
+-- Rename the stash in the map spot
+function ProcessStashRenameInputSpot(new_stash_name, renamed_stash_id)
+	local old_stash_list = table.load("saved_stashes")
+	local new_stash_list = {}
+	for _,v in pairs(old_stash_list) do
+		if v.stash_id == renamed_stash_id then
+			v.stash_name = new_stash_name
+		end
+		table.insert(new_stash_list,v)
+	end
+
+    table.save("saved_stashes", new_stash_list)
+	local linked_stash_spot_text = new_stash_name .. "\\n" .. "%c[0,0,255,1]<< STASH LINKED WITH REMOTE ACCESS TOOL >>%c[default]"
+	del_map_spot(renamed_stash_id, safe_StorageViewer.MAPSPOTTYPE)
+	map_spot(renamed_stash_id, safe_StorageViewer.MAPSPOTTYPE ,linked_stash_spot_text)
+end
+
+function ProcessStashNameInput(entered_name, confirmed, new_zstash_id)
+    if confirmed and entered_name and new_zstash_id then
+        local name_to_save = string.trim(entered_name) -- Trim whitespace
+        if name_to_save == "" then
+            name_to_save = level.name() .. new_zstash_id -- Default if empty
+        end
+
+        local stash_list = table.load("saved_stashes") or {} -- Ensure it's a table
+
+        -- Check if stash already added (by ID, name doesn't matter for this check)
+        local already_exists = false
+        for _,v in pairs(stash_list) do
+            if v.stash_id == new_zstash_id then
+                -- If it exists, update its name instead of adding a new one
+                v.stash_name = name_to_save
+                already_exists = true
+                break
+            end
+        end
+
+        if not already_exists then
+            table.insert(stash_list, CreateStashEntry(name_to_save, new_zstash_id))
+        end
+
+        table.save("saved_stashes", stash_list)
+
+        local zstash_str = "%%c[0,255,0,1]STASH ADDED TO REMOTE ACCESS TOOL%%c[default]: %s"
+        local text_sms = string.extformat(translate(zstash_str), name_to_save)
+        sms(text_sms, nil, "nano", 5000)
+    end
+
+	-- Intercepting StorageViewer.CloseViewer() to update map spot for linked stash
+	if confirmed then
+		LinkMapSpot(new_zstash_id)
+	end
+
+	-- Open the stash to update mapspot data
+	local stash_box = level.object_by_id(new_zstash_id)
+	local storageViewer = safe_StorageViewer.StorageViewer(stash_box:binded_object())
+	level.start_stop_menu(storageViewer,true)
+end
+
+-- Update the Map Spot of the stash everytime the stash box is opened manually
+function LinkMapSpot(new_zstash_id)
+	working_zstash_id = new_zstash_id
+
+	if not original_StorageViewer_CloseViewer then
+		original_StorageViewer_CloseViewer = safe_StorageViewer.StorageViewer.CloseViewer
+	end
+
+	safe_StorageViewer.StorageViewer.CloseViewer = function(working_stash)
+		-- working_stash is self
+		if working_stash.binderObject.object:id() == working_zstash_id then
+			del_map_spot(working_zstash_id, safe_StorageViewer.MAPSPOTTYPE)
+			local stash_name = GetStashName(working_zstash_id)
+			local linked_stash_spot_text = stash_name .. "\\n" .. "%c[0,0,255,1]<< STASH LINKED WITH REMOTE ACCESS TOOL >>%c[default]"
+			map_spot(working_zstash_id, safe_StorageViewer.MAPSPOTTYPE ,linked_stash_spot_text)
+			disable_info("biznes_remove_special_item")
+			disable_info("save_prohibited")
+			give_info("ui_rukzak_hide")
+			RestoreCloseViewer() -- Re patch CloseViewer()
+		end
+	end
+end
+
+-- Restore all the patched functions and reset the global vars
+function RestoreCloseViewer()
+	if original_StorageViewer_CloseViewer then
+        if safe_StorageViewer and safe_StorageViewer.StorageViewer then -- Check if class still exists
+            safe_StorageViewer.StorageViewer.CloseViewer = original_StorageViewer_CloseViewer
+        end
+        original_StorageViewer_CloseViewer = nil
+    end
+	working_zstash_id = nil
+end
