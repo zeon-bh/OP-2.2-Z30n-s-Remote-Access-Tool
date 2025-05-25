@@ -22,6 +22,10 @@
 
 		<list x="73" y="70" width="312" height="350" item_height="18"/>
 
+		<btn_search x="180" y="40" width="32" height="32">
+			<texture>ui\ui_magnifier</texture>
+		</btn_search>
+
 		<btn_rename x="52" y="440" width="110" height="29">
 			<text x="2" y="2" align="c" font="graffiti22" r="238" g="153" b="26">"Rename Stash"</text>	
 			<texture>ui_button_ordinary</texture>
