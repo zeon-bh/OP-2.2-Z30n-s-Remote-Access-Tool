@@ -99,9 +99,15 @@ function ZStashMenu:InitControls()
 	self.stash_preview_panel:Show(false) -- Hide the preview window untill a stash name has been selected
 
 	-- Button Inits
+	-- Search Linked Stashes
+	self.btn_search=xml:Init3tButton("main_dialog:btn_search", self.dialog)
+	self:Register(self.btn_search,"btn_search")
+	self.btn_search:Enable(true)
+	-- Rename Stash
 	self.ok_rename=xml:Init3tButton("main_dialog:btn_rename", self.dialog)
 	self:Register(self.ok_rename,"btn_rename")
 	self.ok_rename:Enable(true)
+	-- Ok/Cancel
 	self.ok_btn=xml:Init3tButton("main_dialog:btn_ok", self.dialog)
 	self:Register(self.ok_btn,"btn_ok")
 	self.ok_btn:Enable(true)
@@ -114,6 +120,7 @@ function ZStashMenu:InitControls()
 end
 
 function ZStashMenu:InitCallBacks()
+	self:AddCallback("btn_search", ui_events.BUTTON_CLICKED, self.on_search, self)
 	self:AddCallback("btn_rename", ui_events.BUTTON_CLICKED, self.on_rename, self)
 	self:AddCallback("btn_ok", ui_events.BUTTON_CLICKED, self.on_ok, self)
 	self:AddCallback("btn_quit", ui_events.BUTTON_CLICKED, self.on_cancel, self)
@@ -316,6 +323,18 @@ function ZStashMenu:OnKeyboard(dik, keyboard_action)
 		end
 	end
 	return true
+end
+
+-- Search Item in Linked Stashes
+function ZStashMenu:on_search()
+	local input_dialog = ui_zstash_input.ZStashInputDialog("Search for an item in Linked Stashes:" , current_name, nil, false, self)
+    
+    local ir_wnd = level.main_input_receiver()
+    if ir_wnd then
+        ir_wnd:GetHolder():start_stop_menu(input_dialog, true)
+    else
+        level.start_stop_menu(input_dialog, true)
+    end
 end
 
 -- Rename Linked Stashes
