@@ -4869,18 +4869,18 @@ W wielu wojnach miecz-jian był stopniowo zastępowany innymi rodzajami broni i 
 	</string>
 
 	<string id="item_zstash_name">
-		<rus>Телепортатор</rus>
-		<eng>"Remote Acess Tool"</eng>
-		<ukr>Телепортатор</ukr>
-		<fra>Téléport</fra>
-		<pln>Teleporter</pln>
+		<rus>Средство удаленного доступа</rus>
+		<eng>Remote Access Tool</eng>
+		<ukr>Засіб віддаленого доступу</ukr>
+		<fra>Outil d'accès à distance</fra>
+		<pln>Narzędzie zdalnego dostępu</pln>
 	</string>
 	<string id="item_zstash_desc">
-		<rus>Универсальный ручной телепортатор. Позволяет с одного устройства пользоваться всеми найденными ручными телепортами. При нахождении очередного ручного телепорта координаты нового перемещения автоматически добавляются в устройство.</rus>
-		<eng>"Access your created player stash remotely using this tool.\\n\\n NOTE: To access your stash you must manually add your existing stash by opening it physically first, this will add the stash to the remote access tool list."</eng>
-		<ukr>Універсальний ручний телепортатор. Дозволяє з одного пристрою користуватися усіма знайденими ручними телепортами. При знаходженні наступного телепорту координати нового переміщення автоматично додаються у пристрій.</ukr>
-		<fra>Un téléporteur de poche polyvalent. Un appareil qui permet d'utiliser tous les téléports de poche trouvés. Lors de la recherche du téléport suivant, les nouvelles coordonnées de déplacement sont automatiquement ajoutées à l'appareil. </fra>
-		<pln>Uniwersalny ręczny teleporter. Pozwala z pomocą jednego przyrządu korzystać ze wszystkich posiadanych ręcznych teleportów. Po znalezieniu kolejnego ręcznego teleportu współrzędne nowego przejścia automatycznie zapiszą się w przyrządzie.</pln>
+		<rus>Средство удаленного доступа может использоваться для открытия схронов игрока удаленно из любого места в Зоне.\n\n\n\n ПРИМЕЧАНИЕ: Чтобы получить доступ к вашему схрону, вы должны сначала добавить ваш схрон, открыв его физически. Это откроет диалоговое окно для ввода имени вашего схрона. Ввод пустого имени сохранит имя схрона на основе места, где он размещен. Нажав кнопку отмены, вы можете продолжать использовать схрон как обычно, не добавляя его в Средство удаленного доступа.</rus>
+		<eng>The Remote Access Tool [RAT] can be use to open the player stashes remotely from any location in the Zone.\n\n\n\n NOTE: To access your stash you must first add your stash by opening it physically. This will open the dialog box to enter your stash name. Entering an empty name will save the stash name based on the location it is placed in. By pressing the cancel button, you can continue to use the stash normally without adding it to the Remote Access Tool.</eng>
+		<ukr>Засіб віддаленого доступу може використовуватися для відкриття схованок гравця віддалено з будь-якого місця в Зоні.\n\n\n\nПРИМІТКА: Щоб отримати доступ до вашої схованки, ви повинні спочатку додати вашу схованку, відкривши її фізично. Це відкриє діалогове вікно для введення назви вашої схованки. Введення порожнього імені збереже назву схованки на основі місця, де вона розміщена. Натиснувши кнопку скасування, ви можете продовжувати використовувати схованку як зазвичай, не додаючи її до Засобу віддаленого доступу.</ukr>
+		<fra>L'Outil d'accès à distance peut être utilisé pour ouvrir les caches du joueur à distance depuis n'importe quel endroit dans la Zone.\n\n\n\nNOTE : Pour accéder à votre cache, vous devez d'abord ajouter votre cache en l'ouvrant physiquement. Cela ouvrira la boîte de dialogue pour saisir le nom de votre cache. La saisie d'un nom vide enregistrera le nom de la cache en fonction de l'endroit où elle est placée. En appuyant sur le bouton Annuler, vous pouvez continuer à utiliser la cache normalement sans l'ajouter à l'Outil d'accès à distance.</fra>
+		<pln>Narzędzie zdalnego dostępu może być używane do zdalnego otwierania skrytek gracza z dowolnej lokalizacji w Strefie.\n\n\n\nUWAGA: Aby uzyskać dostęp do swojej skrytki, musisz najpierw dodać swoją skrytkę, otwierając ją fizycznie. Otworzy to okno dialogowe do wprowadzenia nazwy skrytki. Wprowadzenie pustej nazwy zapisze nazwę skrytki na podstawie lokalizacji, w której jest umieszczona. Naciskając przycisk Anuluj, możesz nadal używać skrytki normalnie, nie dodając jej do Narzędzia zdalnego dostępu.</pln>
 	</string>
 
 </string_table>
