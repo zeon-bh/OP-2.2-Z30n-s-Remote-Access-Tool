@@ -1,12 +1,19 @@
 -- Z Stash Util Functions and definitions
 local original_StorageViewer_CloseViewer = nil
 working_zstash_id = nil
+local debug = true
 
 local function CreateStashEntry(name, id)
     return {
         stash_name = name,
         stash_id = id
     }
+end
+
+function debug_log(str,...)
+	if debug then
+		log("Z Remote Stash:debug: "..str,...)
+	end
 end
 
 -- Function to check whether player has the z stash tool and if stash is already added to the list
@@ -37,7 +44,7 @@ end
 
 -- Check if stash exists or not in the list
 function StashAlreadyAdded(zstash_id)
-	local s_list = table.load("saved_stashes") or {}
+	local s_list = table.load("zstash_linked_stashes") or {}
 	if table.size(s_list) > 0 then
 		for _,v in pairs(s_list) do
 			if v.stash_id == zstash_id then 
@@ -49,7 +56,7 @@ end
 
 -- Getters for Name and ID
 function GetStashName(zstash_id)
-	local s_list = table.load("saved_stashes") or {}
+	local s_list = table.load("zstash_linked_stashes") or {}
 	if table.size(s_list) > 0 then
 		for _,v in pairs(s_list) do
 			if v.stash_id == zstash_id then 
@@ -60,7 +67,7 @@ function GetStashName(zstash_id)
 end
 
 function GetStashID(zstash_name)
-	local s_list = table.load("saved_stashes") or {}
+	local s_list = table.load("zstash_linked_stashes") or {}
 	if table.size(s_list) > 0 then
 		for _,v in pairs(s_list) do
 			if v.stash_name == zstash_name then 
@@ -70,11 +77,11 @@ function GetStashID(zstash_name)
 	end
 end
 
--- Function to call when you want to add/rename a stash
+-- Function to Add a Linked Stash
 function AddStashToDevice(new_zstash_id)
     local current_name = level.name() .. " -- " .. tostring(new_zstash_id) -- Default initial name    
-
-    local input_dialog = ui_zstash_input.ZStashInputDialog("Remote Access Tool [Set Stash Name and Link]:", current_name, new_zstash_id, false)
+	local process_func = "add"
+    local input_dialog = ui_zstash_input.ZStashInputDialog("Remote Access Tool [Set Stash Name and Link]:", current_name, new_zstash_id, nil, process_func)
     
     local ir_wnd = level.main_input_receiver()
     if ir_wnd then
@@ -85,8 +92,8 @@ function AddStashToDevice(new_zstash_id)
 end
 
 -- Rename the stash in the map spot
-function ProcessStashRenameInputSpot(new_stash_name, renamed_stash_id)
-	local old_stash_list = table.load("saved_stashes")
+function RenameZStashSpot(new_stash_name, renamed_stash_id)
+	local old_stash_list = table.load("zstash_linked_stashes")
 	local new_stash_list = {}
 	for _,v in pairs(old_stash_list) do
 		if v.stash_id == renamed_stash_id then
@@ -95,55 +102,74 @@ function ProcessStashRenameInputSpot(new_stash_name, renamed_stash_id)
 		table.insert(new_stash_list,v)
 	end
 
-    table.save("saved_stashes", new_stash_list)
+    table.save("zstash_linked_stashes", new_stash_list)
 	local linked_stash_spot_text = new_stash_name .. "\\n" .. "%c[0,0,255,1]<< STASH LINKED WITH REMOTE ACCESS TOOL >>%c[default]"
 	del_map_spot(renamed_stash_id, safe_StorageViewer.MAPSPOTTYPE)
 	map_spot(renamed_stash_id, safe_StorageViewer.MAPSPOTTYPE ,linked_stash_spot_text)
 end
 
-function ProcessStashNameInput(entered_name, confirmed, new_zstash_id)
-    if confirmed and entered_name and new_zstash_id then
-        local name_to_save = string.trim(entered_name) -- Trim whitespace
-        if name_to_save == "" then
-            name_to_save = level.name() .. new_zstash_id -- Default if empty
-        end
+-- Process Stash name input text and call the right process_func
+function ProcessStashNameInput(process_func, entered_name, new_zstash_id, confirmed)
+	if process_func == "add" then
+		-- Link the stash
+		if confirmed and entered_name and new_zstash_id then
+			debug_log("Adding Stash...")
+			local name_to_save = string.trim(entered_name) -- Trim whitespace
+			if name_to_save == "" then
+				name_to_save = level.name() .. new_zstash_id -- Default if empty
+			end
 
-        local stash_list = table.load("saved_stashes") or {} -- Ensure it's a table
+			local stash_list = table.load("zstash_linked_stashes") or {} -- Ensure it's a table
 
-        -- Check if stash already added (by ID, name doesn't matter for this check)
-        local already_exists = false
-        for _,v in pairs(stash_list) do
-            if v.stash_id == new_zstash_id then
-                -- If it exists, update its name instead of adding a new one
-                v.stash_name = name_to_save
-                already_exists = true
-                break
-            end
-        end
+			-- Check if stash has a unique name in the list
+			local already_exists = false
+			for _,v in pairs(stash_list) do
+				if string.lower(v.stash_name) == string.lower(entered_name) then
+					already_exists = true
+					break
+				end
+			end
 
-        if not already_exists then
-            table.insert(stash_list, CreateStashEntry(name_to_save, new_zstash_id))
-        end
+			if not already_exists then
+				table.insert(stash_list, CreateStashEntry(name_to_save, new_zstash_id))
 
-        table.save("saved_stashes", stash_list)
+				table.save("zstash_linked_stashes", stash_list)
 
-        local zstash_str = "%%c[0,255,0,1]STASH ADDED TO REMOTE ACCESS TOOL%%c[default]: %s"
-        local text_sms = string.extformat(translate(zstash_str), name_to_save)
-        sms(text_sms, nil, "nano", 5000)
-    end
+				local zstash_str = "%%c[0,255,0,1]STASH ADDED TO REMOTE ACCESS TOOL%%c[default]: %s"
+				local text_sms = string.extformat(translate(zstash_str), name_to_save)
+				sms(text_sms, nil, "nano", 5000)
 
-	-- Intercepting StorageViewer.CloseViewer() to update map spot for linked stash
-	if confirmed then
-		LinkMapSpot(new_zstash_id)
+				-- Intercepting StorageViewer.CloseViewer() to update map spot for linked stash
+				if confirmed then
+					LinkMapSpot(new_zstash_id)
+				end
+			else
+				-- Name already exists then exit without opening stash box
+				local zstash_str = "%%c[0,255,0,1]REMOTE ACCESS TOOL%%c[default]: A Stash with the name [%s] already exists, use a different name to link the current stash."
+				local text_sms = string.extformat(translate(zstash_str), entered_name)
+				sms(text_sms, nil, "nano", 5000)
+			end
+		end
+		-- Open the stash to update mapspot data
+		local stash_box = level.object_by_id(new_zstash_id)
+		local storageViewer = safe_StorageViewer.StorageViewer(stash_box:binded_object())
+		level.start_stop_menu(storageViewer,true)
+	elseif process_func == "rename" and confirmed then
+		debug_log("Renaming Stash...")
+		RenameZStashSpot(entered_name,new_zstash_id)
+	elseif process_func == "search" and confirmed then
+		debug_log("Searching Linked Stashes...")
+		-- Search for Item in Linked Stashes
+		local linked_zstashes = table.load("zstash_linked_stashes")
+		return FindItemLinkedStashes(linked_zstashes, entered_name)
+	else
+		if confirmed then
+			debug_log("Invalid process function name, ABORTING!!!")
+		end
 	end
-
-	-- Open the stash to update mapspot data
-	local stash_box = level.object_by_id(new_zstash_id)
-	local storageViewer = safe_StorageViewer.StorageViewer(stash_box:binded_object())
-	level.start_stop_menu(storageViewer,true)
 end
 
--- Update the Map Spot of the stash everytime the stash box is opened manually
+-- Update the Map Spot of the stash everytime the stash box is opened physically
 function LinkMapSpot(new_zstash_id)
 	working_zstash_id = new_zstash_id
 
@@ -175,4 +201,76 @@ function RestoreCloseViewer()
         original_StorageViewer_CloseViewer = nil
     end
 	working_zstash_id = nil
+end
+
+
+----- Search items in Linked stashes -----
+
+-- Convert string to lower cases
+local function Sanitize(str)
+    if type(str) ~= "string" then return "" end -- Handle potential non-string items
+    return str:lower()
+end
+
+-- Returns a table of matching words for the search item string passed
+function FindItemInTable(zstash_name, search_string, str_table, case_insensitive)
+    if case_insensitive == nil then case_insensitive = true end
+    local matches = {}
+    for str_key,count in pairs(str_table) do
+        if type(str_key) == "string" then -- Ensure it's a string
+            if string.find(Sanitize(str_key), Sanitize(search_string)) then
+				matches[str_key] = {stash_name = zstash_name, count = count}
+            end
+        end
+    end
+	for k,v in pairs(matches) do
+		debug_log("FindItemInTable() : Item_Key = %s | stash_name = %s | count = %d", k, v.stash_name, v.count)
+	end
+
+    return matches
+end
+
+-- Find an Item in the Linked Stashes
+function FindItemLinkedStashes(linked_zstashes, item_to_search)
+	local systemIniReader = ini_reader.iniReader()
+	local search_results = {} -- Will contain Linked Stash Name, table of all matched items
+
+	for _,zstash in pairs(linked_zstashes) do
+		local storage_id_key = "storage_" .. zstash.stash_id
+    	local stash_data = table.deep_copy(keyvals("storages"):get(storage_id_key, nil))
+		local item_data_table = {}
+
+		-- Skip Empty or Invalid Linked Stashes
+		if stash_data and table.size(stash_data) > 0 then
+        	for item_type, item_tbl in pairs(stash_data) do
+				-- Get all the items from this itype
+				for index, data in pairs(item_tbl) do
+                	if data.section then
+						local item_name = systemIniReader:readTranslatedString(data.section, "inv_name")
+
+						if not item_name then item_name = "Unknown: " .. data.section end
+
+						-- Insert the items found in the stash
+						if item_data_table[item_name] then
+                        local currentItem = item_data_table[item_name]
+							item_data_table[item_name] = item_data_table[item_name] + (data.params.count or 1)
+						else
+							item_data_table[item_name] = (data.params.count or 1)
+						end
+					end
+				end
+			end
+			local matched_item_table = FindItemInTable(zstash.stash_name, item_to_search, item_data_table)
+
+			if matched_item_table and table.size(matched_item_table) > 0 then
+				for item_key,item_data in pairs(matched_item_table) do
+					if search_results[item_key] == nil then
+						search_results[item_key] = {} -- New list instance for this item_key
+					end
+					table.insert(search_results[item_key], item_data)
+				end
+			end
+    	end
+	end
+	return search_results
 end

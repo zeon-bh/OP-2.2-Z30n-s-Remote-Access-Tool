@@ -5,15 +5,9 @@ local def_color={255,216,186,140}
 local sel_color={255,0,150,100}
 local cur_color={255,255,0,0}
 
-local DEPLETE_RATE = 0.07 -- Decrease by 7% after every use
+local DEPLETE_RATE = 0.08 -- Decrease by 7% after every use
 local TELEPORT_SAFETY_THRESHOLD = 1 -- Limit at which Teleport artifacts cannot be used for opening remote stashes
 
-local debug = true
-function debug_log(str,...)
-	if debug then
-		log("Z Remote Stash:debug: "..str,...)
-	end
-end
 
 function StashData:__init(sdata) super()
 	self:SetWndRect(0,0,430,22)
@@ -24,7 +18,7 @@ function StashData:__init(sdata) super()
 	self.fn:SetFont(GetFontLetterica18Russian())
 	self.fn:SetTextColor(unpack(def_color))
 	self.stash_name = sdata.stash_name
-	self.fn:SetText(translate(self.stash_name))
+	self.fn:SetText(self.stash_name)
 	self.sid = sdata.stash_id
 	if safe_StealManager.GetStealManagerClass():IsStolen(self.sid) then
 		self.fn:SetTextColor(unpack(cur_color))
@@ -42,40 +36,6 @@ function ZStashMenu:__init() super()
 	self.last_select_item = nil
 	self.teleport_artifacts = nil
 	self:InitTeleport()
-end
-
-function ZStashMenu:InitStashList()
-	local cur_stash_list = table.load("saved_stashes")
-	local new_stash_list = {}
-
-	-- Check if stashes are valid
-	for _,v in pairs(cur_stash_list) do
-		local test_storage_id = "storage_" .. v.stash_id
-		local stash_id_valid = keyvals("storages"):get(test_storage_id, nil)
-
-		-- Ignore all the invalid ids [Most likely the stash was removed by the player]
-		if stash_id_valid and server_object(v.stash_id) then
-			table.insert(new_stash_list,v)
-		end
-	end
-
-	table.save("saved_stashes", new_stash_list)
-	self.stash_list = new_stash_list
-end
-
--- Fill out all the saved player stashes into the list Window 
-function ZStashMenu:FillList()
-	local list_box = self:GetListWnd("list_window")
-	local s_itm
-
-	if table.size(self.stash_list)>1 then
-		table.sort(self.stash_list,function(a,b) return a.stash_name < b.stash_name end)
-	end
-
-	for _,v in pairs(self.stash_list) do
-		s_itm = StashData(v)
-		list_box:AddItem(s_itm)
-	end
 end
 
 function ZStashMenu:InitControls()
@@ -98,11 +58,24 @@ function ZStashMenu:InitControls()
 	self.stash_preview_panel.stash_text_content:SetText("") -- Clear it initially
 	self.stash_preview_panel:Show(false) -- Hide the preview window untill a stash name has been selected
 
-	-- Button Inits
 	-- Search Linked Stashes
-	self.btn_search=xml:Init3tButton("main_dialog:btn_search", self.dialog)
+	self.btn_search = CUIButton()
+	self.btn_search:Init(420, 120, 16, 16)
+	self.btn_search:InitTexture("ui\\ui_magnifier")
+	self.btn_search:SetOriginalRect(0, 0, 16, 16)
+	self.btn_search:SetStretchTexture(false)
 	self:Register(self.btn_search,"btn_search")
+	self:AttachChild(self.btn_search)
 	self.btn_search:Enable(true)
+
+	-- Search Item Window
+	self.stash_search_panel = xml:InitFrame("stash_search_panel", self)
+	self.stash_search_panel.stash_search_caption = xml:InitStatic("stash_search_panel:stash_search_caption", self.stash_search_panel)
+	self.stash_search_panel.stash_search_scroll_area  = xml:InitScrollView("stash_search_panel:stash_search_scroll_area", self.stash_search_panel)
+	self.stash_search_panel.stash_text_search = xml:InitStatic("stash_search_panel:stash_search_scroll_area:stash_text_search", self.stash_search_panel.stash_search_scroll_area)
+	self.stash_search_panel.stash_text_search:SetText("") -- Clear it initially
+	self.stash_search_panel:Show(false) -- Hide the search window until user searches for an item
+
 	-- Rename Stash
 	self.ok_rename=xml:Init3tButton("main_dialog:btn_rename", self.dialog)
 	self:Register(self.ok_rename,"btn_rename")
@@ -119,12 +92,48 @@ function ZStashMenu:InitControls()
 	self:Register(self.ctrl, "list_window")
 end
 
+
 function ZStashMenu:InitCallBacks()
 	self:AddCallback("btn_search", ui_events.BUTTON_CLICKED, self.on_search, self)
 	self:AddCallback("btn_rename", ui_events.BUTTON_CLICKED, self.on_rename, self)
 	self:AddCallback("btn_ok", ui_events.BUTTON_CLICKED, self.on_ok, self)
 	self:AddCallback("btn_quit", ui_events.BUTTON_CLICKED, self.on_cancel, self)
 	self:AddCallback("list_window", ui_events.LIST_ITEM_CLICKED, self.ItemClicked, self)
+end
+
+
+function ZStashMenu:InitStashList()
+	local cur_stash_list = table.load("zstash_linked_stashes")
+	local new_stash_list = {}
+
+	-- Check if stashes are valid
+	for _,v in pairs(cur_stash_list) do
+		local test_storage_id = "storage_" .. v.stash_id
+		local stash_id_valid = keyvals("storages"):get(test_storage_id, nil)
+
+		-- Ignore all the invalid ids [Most likely the stash was removed by the player]
+		if stash_id_valid and server_object(v.stash_id) then
+			table.insert(new_stash_list,v)
+		end
+	end
+
+	table.save("zstash_linked_stashes", new_stash_list)
+	self.stash_list = new_stash_list
+end
+
+-- Fill out all the saved player stashes into the list Window 
+function ZStashMenu:FillList()
+	local list_box = self:GetListWnd("list_window")
+	local s_itm
+
+	if table.size(self.stash_list)>1 then
+		table.sort(self.stash_list,function(a,b) return a.stash_name < b.stash_name end)
+	end
+
+	for _,v in pairs(self.stash_list) do
+		s_itm = StashData(v)
+		list_box:AddItem(s_itm)
+	end
 end
 
 function ZStashMenu:ItemClicked()
@@ -327,7 +336,8 @@ end
 
 -- Search Item in Linked Stashes
 function ZStashMenu:on_search()
-	local input_dialog = ui_zstash_input.ZStashInputDialog("Search for an item in Linked Stashes:" , current_name, nil, false, self)
+	local process_func = "search"
+	local input_dialog = ui_zstash_input.ZStashInputDialog("Search for an item in the Linked Stashes:" , "", nil, self, "search")
     
     local ir_wnd = level.main_input_receiver()
     if ir_wnd then
@@ -360,7 +370,8 @@ function ZStashMenu:on_rename()
 
 	-- Rename the stash
 	local current_name = item.stash_name
-	local input_dialog = ui_zstash_input.ZStashInputDialog("Rename the linked stash [" .. item.stash_name .."]:" , current_name, item.sid, true, self)
+	local process_func = "rename"
+	local input_dialog = ui_zstash_input.ZStashInputDialog("Rename the linked stash [" .. item.stash_name .."]:" , current_name, item.sid, self, process_func)
     
     local ir_wnd = level.main_input_receiver()
     if ir_wnd then
@@ -460,10 +471,9 @@ function ZStashMenu:InitTeleport()
 			return a.uses < b.uses
 	end)
 
-	if debug then
-		for _,v in pairs(teleport_artifacts.teleport) do
-			debug_log("SORTED TABLE | Teleport UID = %d | Teleport Uses = %.2f", v.uid, v.uses)
-		end
+
+	for _,v in pairs(teleport_artifacts.teleport) do
+		zstash_logic.debug_log("SORTED TABLE | Teleport UID = %d | Teleport Uses = %.2f", v.uid, v.uses)
 	end
 
 	-- Select the teleport artifact with lowest uses greater than TELEPORT_THRESHOLD and calculate total uses
@@ -471,7 +481,7 @@ function ZStashMenu:InitTeleport()
 	for _,art in pairs(teleport_artifacts.teleport) do
 		if art.uses > 0 and not teleport_artifacts.selected_artifact then -- If current artifact is depleted skip to next one
 			teleport_artifacts.selected_artifact = art
-			debug_log("SELECTED ARTIFACT | UID = %d | USES = %d", art.uid, art.uses)
+			zstash_logic.debug_log("SELECTED ARTIFACT | UID = %d | USES = %d", art.uid, art.uses)
 		end
 		total_uses = total_uses + art.uses
 	end
@@ -484,8 +494,8 @@ function ZStashMenu:InitTeleport()
 			if total_uses >= 11 then
 				color_code = "[0,0,255,1]" -- GREEN
 			end
-			if total_uses >= 6 and total_uses < 12 then
-				color_code = "[0,125,125,1]" -- Yellow
+			if total_uses >= 4 and total_uses < 8 then
+				color_code = "[0,150,125,1]" -- Yellow
 			end
 		end
 		local condition_text = string.format("%%c%s%d%%c[default]", color_code, total_uses)
@@ -499,4 +509,41 @@ function ZStashMenu:InitTeleport()
 	self.tele_uses:SetText(getTeleportText(total_uses))
 
 	self.teleport_artifacts = teleport_artifacts
+end
+
+-- Display the search results
+function ZStashMenu:SearchResult(search_item, search_results)
+	local result_str = ""
+	if search_results and table.size(search_results) > 0 then
+		-- Sort the search_results table in alphabetical order
+		local keys = {}
+		for key, item_table in pairs(search_results) do
+			table.insert(keys,key)
+		end
+		table.sort(keys) -- Sort the key values inside the keys table in alpha ascending
+		for _,v in ipairs(keys) do
+			zstash_logic.debug_log("SearchResult() : Keys = %s", v)
+		end
+
+		for _,item_key in ipairs(keys) do
+			local item_data_str = ""
+			local total_count = 0
+			for _,item_data in pairs(search_results[item_key]) do
+				local item_meta_str = string.format("  %s (%d)\\n", item_data.stash_name, item_data.count)
+				total_count = total_count + item_data.count
+				item_data_str = string.format("%s%s",item_data_str,item_meta_str)
+			end
+			local new_result_str = string.format("%%c[0,0,255,1]%s%%c[default]  [%%c[0,255,255,1]%d%%c[default]]%s%s", item_key, total_count,"\\n", item_data_str)
+			result_str = string.format("%s\\n%s", result_str,new_result_str)
+		end
+	else
+		result_str = string.format("%s not found in any of the Linked Stashes!!!", search_item)
+	end
+	
+	local search_window_caption = string.format("Search Results for [%s]:", search_item)
+
+	self.stash_search_panel.stash_search_caption:SetText(search_window_caption)
+	self.stash_search_panel.stash_text_search:SetText(result_str)
+	self.stash_search_panel.stash_search_scroll_area:ScrollToBegin()
+	self.stash_search_panel:Show(true)
 end

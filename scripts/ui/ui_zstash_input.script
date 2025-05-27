@@ -1,18 +1,18 @@
 ------ Text Box CUI class ------
 
 class "ZStashInputDialog" (CUIScriptWnd)
-function ZStashInputDialog:__init(prompt_text, current_text, object_id, rename_stash, parent_class) super()
+function ZStashInputDialog:__init(prompt_text, current_text, object_id, parent_class, process_func) super()
 	self.prompt_text = prompt_text
 	self.current_text = current_text
-	self.enter_pressed_in_editbox = false
 	self.current_stash_id = object_id
-	self.rename_stash = rename_stash
 	self.parent_class = parent_class or nil
+	self.process_func = process_func
+	self.enter_pressed_in_editbox = false
 
 	self:InitControls()
 	self:InitCallBacks()
 	self.caption_static:SetText(self.prompt_text)
-	if self.rename_stash then self.edit_box:SetText(self.current_text) end
+	if self.process_func == "rename" then self.edit_box:SetText(self.current_text) end
 end
 
 function ZStashInputDialog:InitControls()
@@ -50,21 +50,24 @@ end
 function ZStashInputDialog:OnButton_OK_Clicked()
 	local entered_text = self.edit_box:GetText()
 	self:GetHolder():start_stop_menu(self, true) -- Close this dialog
-	if self.rename_stash then
-		zstash_logic.ProcessStashRenameInputSpot(entered_text, self.current_stash_id)
+
+	if string.len(entered_text) ~= 0 or self.process_func == "add" then -- Skip if empty string closing the dialog box
+		local search_results = zstash_logic.ProcessStashNameInput(self.process_func, entered_text, self.current_stash_id, true)
 		if self.parent_class then
-			self.parent_class:UpdateList()
+			if self.process_func == "rename" then
+				self.parent_class:UpdateList()
+			elseif self.process_func == "search" then
+				self.parent_class:SearchResult(entered_text, search_results)
+			else
+				zstash_logic.debug_log("Invalid process_func on Confirmation!!!")
+			end
 		end
-	else
-		zstash_logic.ProcessStashNameInput(entered_text, true, self.current_stash_id) -- Pass text and success flag
 	end
 end
 
 function ZStashInputDialog:OnButton_Cancel_Clicked()
 	self:GetHolder():start_stop_menu(self, true) -- Close this dialog
-	if not self.rename_stash then
-		zstash_logic.ProcessStashNameInput(nil, false, self.current_stash_id) -- Pass nil and failure/cancel flag
-	end
+	zstash_logic.ProcessStashNameInput(self.process_func, nil, self.current_stash_id, false) -- Pass nil and failure/cancel flag
 end
 
 function ZStashInputDialog:OnKeyboard(dik, keyboard_action)
