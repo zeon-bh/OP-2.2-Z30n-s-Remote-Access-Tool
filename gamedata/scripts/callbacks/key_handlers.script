@@ -1,0 +1,273 @@
+local cheat_wnd
+local shift_state=false
+local alt_state=false
+local time_factor_default=config:r_float("alife","time_factor")
+local time_factor_step=100
+
+local keys={
+	["press"]={
+		-- [DIK_keys.DIK_MINUS]={
+			-- func=function(key,binded_action)
+				-- if true then return end
+				-- if shift_state then
+					-- local current_time_factor=level.get_time_factor()-time_factor_step
+					-- if (current_time_factor<=0) then
+						-- sms("Set time factor to default!")
+						-- current_time_factor=time_factor_default
+					-- end
+					-- level.set_time_factor(current_time_factor)
+				-- end
+			-- end
+		-- },
+		-- [DIK_keys.DIK_MULTIPLY]={
+			-- func=function(key,binded_action)
+				-- if shift_state then
+					-- level.set_time_factor(time_factor_default)
+				-- end
+			-- end
+		-- },
+		-- [DIK_keys.DIK_ADD]={
+			-- func=function(key,binded_action)
+				-- if shift_state then
+					-- local current_time_factor=level.get_time_factor()+time_factor_step
+					-- level.set_time_factor(current_time_factor)
+				-- end
+			-- end
+		-- },
+		[DIK_keys.DIK_F1]={
+			func=function(key,binded_action)
+				if not game_is_running() then
+					return
+				end
+				if shift_state and is_dev_mode() then
+					local f = getFS()
+					if f:exist("$game_scripts$", "test.script") then
+						local test_name = f:update_path("$game_scripts$", "test.script")
+						run_file(test_name)	
+					end					
+				end
+			end
+		},
+		[DIK_keys.DIK_F2]={
+			func=function(key,binded_action) 
+				if not game_is_running() then
+					return
+				end
+				if shift_state and is_dev_mode() then
+					local f = getFS()
+					if f:exist("$game_scripts$", "test2.script") then
+						local test_name = f:update_path("$game_scripts$", "test2.script")
+						run_file(test_name)	
+					end	
+				end
+			end
+		},
+		[DIK_keys.DIK_F4]={
+			func=function(key,action)
+				if not game_is_running() then
+					return
+				end
+				if is_dev_mode() then
+					if shift_state then
+						utils.set_coords_visible(not utils.get_coords_visible())
+					else
+						if not cheat_wnd then
+							cheat_wnd = positioninformer.pi()
+						end
+						cheat_wnd:showposinfo()
+						level.start_stop_menu(level.main_input_receiver(), true)
+						level.start_stop_menu(cheat_wnd, true)
+					end
+				end
+			end
+		},
+		[DIK_keys.DIK_I]={
+			func=function(key,action)
+				local spawn_item = "zstash"
+				local zstash_exists = false
+				db.actor:iterate_ruck(function(item)
+					if item then
+						if item:section() == spawn_item then
+							zstash_exists = true
+						end
+					end
+				end)
+				if not zstash_exists then
+					create(spawn_item,db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id(), db.actor:id())
+					for i=1,5 do -- Spawn 5 Teleporters
+						create("af_teleport",db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id(), db.actor:id())
+					end
+				end
+			end
+		}, 
+		[DIK_keys.DIK_LALT]={
+			func=function()
+				alt_state=true
+			end			
+		},
+		[DIK_keys.DIK_RALT]={
+			func=function()
+				alt_state=true
+			end			
+		},
+		[DIK_keys.DIK_LSHIFT]={
+			func=function()
+				shift_state=true
+			end			
+		}		
+	},
+	["release"]={
+		[DIK_keys.DIK_LSHIFT]={
+			func=function()
+				shift_state=false
+			end			
+		},
+		[DIK_keys.DIK_LALT]={
+			func=function()
+				alt_state=false
+			end			
+		},
+		[DIK_keys.DIK_RALT]={
+			func=function()
+				alt_state=false
+			end			
+		}
+	}
+}
+
+local keys_action={
+	["scores"]={
+		func=function()
+			if alt_state or shift_state then
+				return
+			end
+			if game_is_running() and not level.main_input_receiver() then
+				reminder.remind()
+				_G.Treasure:remind()
+			end
+		end,
+	},
+	["use_user_action0"]={
+		func=function() 
+			if game_is_running() and not level.main_input_receiver() then
+				if _G.Inventory:on_belt("runner_tele") then
+					fly.runner()
+				else
+					fly.returner()
+				end
+			end
+		end
+	},
+	["use_user_action1"]={
+		func=function() 
+			if game_is_running() and not level.main_input_receiver() then
+				if not db.god.u[3] or db.actor:enemy_see_actor() then return end
+				if db.actor:active_item() then
+					sms("super_jump_0", nil, "nano", 10000)
+					return
+				end
+				if has_info("no_teleport_near_heli_btr") then
+					sms("super_jump_1", nil, "nano", 10000)
+					return 
+				end
+				give_info("teleport_started")
+				local pos=db.actor:position()
+				db.actor:set_actor_position(xyz(pos.x,pos.y+math.random(4,6),pos.z))
+				give_info("teleport_finished")
+				db.god.c[3] = db.god.c[3]+1		
+			end
+		end
+	},
+	["use_user_action2"]={
+		func=function() 
+			if game_is_running() and not level.main_input_receiver() then
+				u3_utils.savegame_on_level()
+			end
+		end
+	},	
+	["use_user_action3"]={
+		func=function() 
+			console:execute("load_last_save")
+		end
+	},
+	["use_user_action4"]={
+		func=function()
+			if game_is_running() and not level.main_input_receiver() then
+				callback_use.place_strelok_turret()
+			end
+		end
+	},
+	["use_user_action5"]={
+		func=function()
+			if game_is_running() and not level.main_input_receiver() then
+				outfit_modules.action()
+			end
+		end
+	}
+}
+
+function handler_release(key,binded_action)
+	handler(key,binded_action,false)
+end
+
+function handler_press(key,binded_action)
+	handler(key,binded_action,true)
+end
+
+function get_handler_key(key_input,key_state)
+	local handler_base=keys[key_state and "press" or "release"]
+	if handler_base then
+		local handler_key=handler_base[key_input]
+		if handler_key then
+			local handler_func=handler_key["func"]
+			if not handler_func then
+				log("! ERROR invalid key hundler table struct!")
+				return nil
+			end
+			return handler_func
+		end
+	end
+	return nil
+end
+
+function get_handler_action(action_id)  
+	local action_name=id_to_action_name(action_id)
+	if action_name==nil or action_name=="" then 
+		return nil 
+	end
+	local handler_action=keys_action[action_name]
+	if handler_action then
+		local handler_func=handler_action["func"]
+		if not handler_func then
+			log("! ERROR invalid key action table struct!")
+			return nil
+		end
+		return handler_func
+	end
+end
+
+function handler(key,binded_action,state)
+	local func=get_handler_key(key,state)
+	if func then
+		func(key,binded_action)
+	else
+		if binded_action~=key_bindings.kNOTBINDED and state then
+			func=get_handler_action(binded_action)
+			if func then
+				func()
+			end
+		end
+	end	
+end
+
+function run_file(file)
+	local res, err = pcall(run_chunk, file)
+	if err then
+		console:show()
+		log(tostring(err))
+	end
+	console:execute("flush")
+end
+function run_chunk(file)
+    local chunk, err = dofile(file)
+end
