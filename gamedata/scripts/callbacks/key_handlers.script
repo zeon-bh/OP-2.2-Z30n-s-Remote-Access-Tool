@@ -81,7 +81,7 @@ local keys={
 				end
 			end
 		},
-		[DIK_keys.DIK_COLON]={
+		[DIK_keys.DIK_SEMICOLON]={
 			func=function(key,action)
 				local spawn_item = "zstash"
 				local zstash_exists = false
