@@ -24,7 +24,7 @@ https://github.com/StormTetris/English-Ukrainian-OP2.2/tree/main
 You do not have to worry about the files being overwritten.
 
 ## Remote Access Tool
-Once you have obtained the Remote Access tool, you need to first add your stashes to the Linked Stashes list to open them remotely.
+Once you have obtained the Remote Access tool, you need to first add your stashes to the Remote Accesss Tool list to open them remotely.
 
 Opening the stashes using the Remote Access Tool requires you to have a Teleport Artefact with enough minimum condition. The Teleport Uses in the top right indicates how many times you can open your stash remotely. A single Teleport artifact has around ~10 uses.
 
@@ -45,7 +45,7 @@ Stolen Stashes cannot be opened with the Remote Access Tool and must be retrieve
   <img width="426" height="240" src="https://www.dropbox.com/scl/fi/h6te0md3e9qwoildqimpm/RAT_add_rename_04.jpg?rlkey=l8j4mhwp30dtlt9frvztwx05k&st=b18t7d11&raw=1">
 </p>
 
-3. You can now open your Remote Access Tool from your inventory to verify your stash is added to the Linked Stashes list. You can now view the contents of your stash directly from the Remote Access Tool without using your PDA. Since this is a new stash the stash is indeed empty.
+3. You can now open your Remote Access Tool from your inventory to verify your stash is added to the Remote Accesss Tool list. You can now view the contents of your stash directly from the Remote Access Tool without using your PDA. Since this is a new stash the stash is indeed empty.
 
 <p align="center">
   <img width="426" height="240" src="https://www.dropbox.com/scl/fi/cjcwc9votj367za8jbn09/RAT_add_rename_05.jpg?rlkey=cnx8bbr4gqplobcwv5x5a41bd&st=0h5v5qra&raw=1">
@@ -66,7 +66,7 @@ Stolen Stashes cannot be opened with the Remote Access Tool and must be retrieve
 
 #### B. Preview stash contents using the Remote Access Tool
 
-1. You can view the contents of your Linked Stashes without opening the stash. Viewing stash contents does not consume Teleport artifact uses. Open your Remote Access Tool and select from the list of your Linked Stashes. After selecting the stash from the list a preview window should appear on the right displaying all the contents of your selected stash.
+1. You can view the contents of your linked stashes without opening the stash. Viewing the stash contents does not consume Teleport artifact uses. Open your Remote Access Tool and select from the list of your linked stashes. After selecting the stash from the list a preview window should appear on the right displaying all the contents of your selected stash.
 
 <p align="center">
   <img width="426" height="240" src="https://www.dropbox.com/scl/fi/3b6w3gixxroa4qgvdrt41/RAT_preview_01.jpg?rlkey=pmg40eigvteqj8l0uiw90zrky&st=kxg703rc&raw=1">
@@ -75,19 +75,23 @@ Stolen Stashes cannot be opened with the Remote Access Tool and must be retrieve
 
 #### C. Searching for an item using Remote Access Tool
 
-1. The Remote Access Tool has an in-built search function which allows you to search for an item in all of your Linked Stashes. Let's say you want to search for an item named dummy.
+1. The Remote Access Tool has an in-built search function which allows you to search for an item from all of your linked stashes. Let's say you want to search for an item named dummy.
 
 <p align="center">
   <img width="426" height="240" src="https://www.dropbox.com/scl/fi/oanl2zbzdpj8teedraktm/RAT_search_01.jpg?rlkey=m77y06q4lgt1casa3nsow99vu&st=uq9nn89w&raw=1">
   <img width="426" height="240" src="https://www.dropbox.com/scl/fi/kpwwgboczdc4kosab95r4/RAT_search_02.jpg?rlkey=mrlhgfuocrna6tfbuzwxf396s&st=tf0shl2w&raw=1">
 </p>
 
-2. After clicking OK, you should get a preview window to the left showing you the results of all items matching the word 'dummy'.The Green text are the items from your search result and the yellow number is the total number of said item in all of your linked stashes. The following white text are the names of the stashes in which the item is stored and the quantity of said item.
+2. After clicking OK, you should get a preview window to the left showing you the results of all items matching the word 'dummy'.The Green text are the items from your search result and the yellow number is the total number of said item from all of your linked stashes. The following white text are the names of the stashes in which the item is stored and the quantity of said item.
 
 <p align="center">
   <img width="426" height="240" src="https://www.dropbox.com/scl/fi/m7m1tufe60srtrw9pq3sw/RAT_search_03.jpg?rlkey=qy977ccnnj9k6k9e6rkqe7mke&st=oeh9i7ov&raw=1">
   <img width="426" height="240" src="https://www.dropbox.com/scl/fi/olh2qryw3nc5bm5b3ipq4/RAT_search_04.jpg?rlkey=9qa4mklm48xl4gox5gdl3zclv&st=p6mv7fkf&raw=1">
 </p>
+
+#### D. Removing Linked Stash from your Remote Access Tool
+
+1. To Remove a linked stash from your Remote Access Tool, Remove the stash directly by using the "Take All" button in the stash UI. (This has to be done directly by interacting with the stash, you cannot remove the stash from the Remote Access Tool, you will get a warning if you try to do this.)
 
 ## Credits
 AMK Team, OP-2.2 or Cumulative Pack 2.2<br/>
