@@ -1,0 +1,302 @@
+function smoke(object,smoke_func)
+	local end_time = game.CTime()
+	end_time:setHMS(24,0,0)
+	end_time:add(game.get_game_time())
+	local data=keyvals("smoking"):get("data",{["count"]=0,["end"]=game.milliseconds(end_time)})
+	data["count"]=data["count"]+1			
+	if data["count"]<10 then
+		smoke_func(object)
+	else
+		if data["end"] < game.milliseconds() then
+			data["end"]=game.milliseconds(end_time)
+			data["count"]=1
+			smoke_func(object)
+		end
+	end
+end
+
+function place_strelok_turret(turrel)
+	local dir = db.actor:direction()
+	if not turrel then
+		turrel=db.actor:object("strelok_turret")
+		if not turrel then
+			return --два раза турель не надо удалять, так как в инвентаре она eatable
+		else
+			release(turrel) --только при размещении по клавише
+		end
+	end
+	local ap = db.actor:position()
+	local lv = db.actor:level_vertex_id()
+	local gv = db.actor:game_vertex_id()
+	local turret = create_turrel("turret_to_strelok",xyz(ap.x+dir.x, ap.y, ap.z+dir.z), lv, gv,"scripts\\technics\\strelok_turret.ltx")
+	map_spot(turret.id, "turret_location", "auto_turret_2")
+end
+
+local spawned={}
+
+function clean_turrel(obj)
+	if not spawned[obj:id()] then
+		spawned[obj:id()]=true
+		release(obj)
+		create("strelok_turret",db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id(),db.actor:id())
+	end
+end
+
+function upgrade_exo_mil(exo)
+	local upg_table={
+		["exo_mil_exoskeleton"]="exo_mil_exoskeleton_add",
+		["exo_mil_exoskeleton_add"]="exo_mil_exoskeleton_addr",
+		["exo_mil_exoskeleton_addr"]="exo_mil_exoskeleton_addrs"
+	}
+	local charge_info=exo:get_exo_outfit():get_charge_info() --без проверок так как только здесь используется
+	charge_info.condition=exo:condition()
+	local old_id=exo:id()
+	release(server_object(exo:id()))
+	local new_exo=create(upg_table[exo:section()],db.actor:position(),db.actor:level_vertex_id(),db.actor:game_vertex_id(),db.actor:id())
+	level.client_spawn_manager():add(new_exo.id, 0, function(ci, id, obj) 
+		obj:set_condition(ci.condition)
+		obj:get_exo_outfit():set_charge(ci.section,ci.charge)
+	end, charge_info)	
+	local modular_storage=container:get("modular_storage", {})
+	modular_storage[new_exo.id]=table.deep_copy(modular_storage[old_id])
+	modular_storage[old_id]=nil
+end
+
+
+local object_sections={
+	["portable_charger"]={
+		func=function(object)
+			local binder=object:binded_object()
+			if binder then
+				binder.ir_wnd=level.main_input_receiver()
+				local cv=charger_viewer.CBViewer(object)
+				if binder.ir_wnd then 
+					binder.ir_wnd:GetHolder():start_stop_menu(cv,true)
+				else
+					level.start_stop_menu(cv,true)
+				end
+				return true
+			end
+			return false
+		end
+	},
+	["arc_art_box_basic"]={
+		func=function(object)
+			local binder=object:binded_object()
+			if binder and binder.slots and binder.protection_koeff then 
+				binder.ir_wnd=level.main_input_receiver()
+				local cv=container_viewer.CAViewer(object)
+				if binder.ir_wnd then 
+					binder.ir_wnd:GetHolder():start_stop_menu(cv,true)
+				else
+					level.start_stop_menu(cv,true)
+				end
+				return true
+			end
+			return false
+		end
+	},
+	["treasure_item"]={
+		func=function(object)
+			if has_info("peshera_go") then
+				sms("on_use_item_0", nil, "nano", 20000)
+				got_item("treasure_item")
+			else
+				safe_StealManager.GetStealManagerClass():SpawnStorage() --спавним по позиции актора
+			end
+		end
+	},
+	["doc_1"]={
+		func=function(object)
+			local e1 = db.actor:object("exo_mil_exoskeleton")
+			if e1 then
+				upgrade_exo_mil(e1)
+				sms("doc_use_0", nil, "nano", 10000)
+			else
+				amk.spawn_item_in_inv("doc_1")
+			end
+		end
+	},
+	["doc_8"]={
+		func=function(object)
+			local e2 = db.actor:object("exo_mil_exoskeleton_add")
+			if e2 then
+				upgrade_exo_mil(e2)
+				sms("doc_use_2_0", nil, "nano", 10000)
+			else
+				amk.spawn_item_in_inv("doc_8")
+			end
+		end
+	},
+	["doc_10"]={
+		func=function(object)
+			local e3 = db.actor:object("exo_mil_exoskeleton_addr")
+			if e3 then
+				upgrade_exo_mil(e3)
+				sms("doc_use_3_0", nil, "nano", 10000)
+			else
+				amk.spawn_item_in_inv("doc_10")
+			end
+		end
+	},
+	["anom_egg"]={
+		func=function(object)
+			fly.start(object)
+		end
+	},	
+	["snotvornoe_tele"]={
+		func=function(object)
+			kostya_dialog.peshera_start()
+		end
+	},
+	["shaxter_tele"]={
+		func=function(object)
+			kostya_dialog.peshera_end()
+		end
+	},
+	["morphin"]={
+		func=function(object)
+			snp.invul_on()
+			new_spawn.morphin_end()
+		end
+	},	
+	["amk_transmutator"]={
+		func=function(object)
+			transmutator.amkEnableDevice()
+		end
+	},
+	["sh_remnabor"]={
+		func=function(object)
+			sh_remnabor.EnableDevice(1)
+		end
+	},
+		["vodka"]={
+		func=function(object)
+			amk_alcohol.drink_vodka(object)
+			_G.Dream:vodka()
+		end
+	},
+	["energy_drink"]={
+		func=function(object)
+			_G.Dream:energy_drink()
+		end
+	},	
+	["suvorotka"]={
+		func=function(object)
+			sickness.clear_sickness()
+		end
+	},	
+	["matras"]={
+		func=function(object)
+			--log("# DEBUG try ti sleep , satiety[%f]",db.actor.satiety)
+			if db.actor.satiety<0.5 then
+				local sound_file=table.random(sound_theme.ph_snd_themes["starvation_sounds"].before_dream)
+				voice(sound_file):play(db.actor, 0, sound_object.s2d)
+				return
+			end
+			local allow_sleep=true
+			local hides = amk_hideouts.hide[level.name()]
+			if hides then
+				for _,hide in ipairs(hides) do
+					if hide.sleep and hide.zone then
+						allow_sleep=allow_sleep or amk_mod.check_npc_in_hideout(db.actor,hide)
+					end
+				end
+			end
+			if allow_sleep then
+				say("zwuk\\inv_sleeping")
+				level.start_stop_menu(ui_matras.Matras(hud), true)
+			else
+				local mir=level.main_input_receiver()
+				if mir then 
+					level.start_stop_menu(mir,true)
+				end
+				amk_hideouts.pda_show_hideouts(true)
+				sms("%c[sender]"..translate("name_istochnik_neizvesten")..":\\n%c[sms_red]"..translate("dream_cant_sleep_here"), 0, "nodata", 0, nil, nil)
+				timer("run", 20.0, "amk_hideouts.pda_hide_hideouts()")				
+			end
+		end
+	},
+	["teleportator"]={
+		func=function(object)
+			level.start_stop_menu(ui_teleportator.teleportator_menu(), true)
+		end
+	},
+	["zstash"]={
+		func=function(object)
+			level.start_stop_menu(ui_zstash.ZStashMenu(), true)
+		end
+	},	
+	["strelok_turret"]={
+		func=function(object)
+			place_strelok_turret(object)
+		end
+	},
+	["money_loot"]={
+		func=function(object)
+			callback_ui.unpack_single_money(nil,object)
+		end
+	},
+	["cigara"]={
+		func=function(object)
+			smoke(object,function(obj)
+				obj:set_condition(obj:condition()-0.4)
+				if (obj:condition()<0.4) then
+					release(obj)
+				end
+				db.actor.psy_health=0.175 --increment
+			end)			
+		end
+	},	
+	["sigaret"]={
+		func=function(object)
+			smoke(object,function(obj)
+				math.randomseed(screen:time_global())
+				local new_condition=obj:condition()-math.random(15,45)/100
+				obj:set_condition(new_condition)
+				if (obj:condition()<0.15) then
+					release(obj)
+				end
+				db.actor.psy_health=0.125 --increment
+			end)			
+		end
+	},
+	["player"]={
+		func=function(object)
+			player_ogg.use_player()
+		end
+	},
+	["ogg_flash_%d+"]={
+		func=function(object)
+			player_ogg.use_flash(object)
+		end
+	},
+	["drug_booster"]={
+		func=function(object)
+			booster.add_booster("drug_booster","ui_hud_icon_hercules")
+		end
+	}
+}
+
+object_sections["money_usa"]=object_sections["money_loot"]
+object_sections["money_euro"]=object_sections["money_loot"]
+
+object_sections["arc_art_box_8basic"]={func=object_sections["arc_art_box_basic"].func}
+object_sections["arc_art_box_1basic"]={func=object_sections["arc_art_box_basic"].func}
+
+setmetatable(object_sections,_G.patternSearchTable)
+
+function process(object)
+	local object_section=object:section()
+	local check_section=object_sections[object_section]
+	if check_section then
+		local func=check_section.func
+		if func then
+			return func(object) or true
+		end
+	elseif config:line_exist(object_section, "doc_view") then
+		doc_viewer.doc_view_on(object_section)
+	end
+	return false
+end
+
