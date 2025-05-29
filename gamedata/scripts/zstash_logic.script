@@ -1,4 +1,4 @@
--- Z Stash Main Logic
+-- Z Stash Util Functions and definitions
 local original_StorageViewer_CloseViewer = nil
 working_zstash_id = nil
 local debug = true

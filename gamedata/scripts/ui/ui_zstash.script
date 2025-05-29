@@ -4,7 +4,7 @@ local def_color={255,216,186,140}
 local sel_color={255,0,150,100}
 local cur_color={255,255,0,0}
 
-local DEPLETE_RATE = 0.09 -- Decrease by 9% after every use
+local DEPLETE_RATE = 0.095 -- Decrease by ~10% after every use
 local TELEPORT_SAFETY_THRESHOLD = 1 -- Limit at which Teleport artifacts cannot be used for opening remote stashes
 
 class "StashData" (CUIListItemEx)
@@ -487,27 +487,28 @@ function ZStashMenu:InitTeleport()
 	end
 
 	-- Set the header text in the menu to display teleport artifact total uses if available
-	local getTeleportText = function(total_uses)
-		local no_artifacts = "%c[0,255,0,1]N/A%c[default]" -- 0 Uses
-		local color_code = "[0,255,0,1]" -- RED
-        if total_uses then
-			if total_uses >= 11 then
-				color_code = "[0,0,255,1]" -- GREEN
-			end
-			if total_uses >= 4 and total_uses < 8 then
-				color_code = "[0,150,125,1]" -- Yellow
-			end
-		end
-		local condition_text = string.format("%%c%s%d%%c[default]", color_code, total_uses)
+	local getTeleportText = function()
+		local condition_text = ""
 		if table.size(teleport_artifacts.teleport) == 0 then
+			local no_artifacts = "%c[0,255,0,1]N/A%c[default]" -- 0 Uses
 			condition_text = no_artifacts
+		else
+			local artifacts_num = table.size(teleport_artifacts.teleport)
+			local max_uses = (math.ceil(1 / DEPLETE_RATE) - TELEPORT_SAFETY_THRESHOLD) * artifacts_num
+			local total_uses = 0
+			for _,art in ipairs(teleport_artifacts.teleport) do
+				total_uses = total_uses + art.uses
+			end
+			local green_channel = math.floor(255 * (total_uses/max_uses))
+			local red_channel = 255 - green_channel
+			local color_code = string.format("[0,%d,%d,1]", red_channel,green_channel)
+			condition_text = string.format("%%c%s%d%%c[default]", color_code, total_uses)
 		end
-        return string.extformat("Teleport Uses: %s", condition_text)
+		return string.extformat("Teleport Uses: %s", condition_text)
     end
 
 	-- Display the total uses if availabe or N/A
-	self.tele_uses:SetText(getTeleportText(total_uses))
-
+	self.tele_uses:SetText(getTeleportText())
 	self.teleport_artifacts = teleport_artifacts
 end
 
