@@ -1,5 +1,4 @@
--- ������������ ����
-class "StashData" (CUIListItemEx)
+--- Remote Access Tool Main UI Script
 
 local def_color={255,216,186,140}
 local sel_color={255,0,150,100}
@@ -8,6 +7,7 @@ local cur_color={255,255,0,0}
 local DEPLETE_RATE = 0.09 -- Decrease by 9% after every use
 local TELEPORT_SAFETY_THRESHOLD = 1 -- Limit at which Teleport artifacts cannot be used for opening remote stashes
 
+class "StashData" (CUIListItemEx)
 
 function StashData:__init(sdata) super()
 	self:SetWndRect(0,0,430,22)
