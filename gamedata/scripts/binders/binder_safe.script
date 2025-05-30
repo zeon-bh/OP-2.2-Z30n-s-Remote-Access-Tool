@@ -115,10 +115,10 @@ end
 
 function SafeBinder:use_callback(obj, who)
 	if not safe_StealManager.GetStealManagerClass():IsStolen(self.object:id()) then --����� �� �� set_nonscript_usable, ������ ������ �������
+		if level.main_input_receiver() then
+			return
+		end
 		local storageViewer
-
-		-- Z Stash add rucksack to z device if present in player's inventory
-		if zstash_logic.CheckZStashTool(self.object:id()) then return end -- Exit out of call back after open UI text dialog
 
 		if not self.storage_config.ui_tool then
 			storageViewer=safe_StorageViewer.StorageViewer(self)
@@ -131,12 +131,9 @@ function SafeBinder:use_callback(obj, who)
 				abort("! ERROR Unknown UI tool for open storage!")
 			end
 		end
-		local ir_wnd=level.main_input_receiver()
-	    if ir_wnd then 
-			ir_wnd:GetHolder():start_stop_menu(storageViewer,true)
-		else
-			level.start_stop_menu(storageViewer,true)
-		end
+		-- Remote Access Tool - add rucksack to the device if present in player's inventory
+		if zstash_logic.CheckZStashTool(self) then return end -- Exit out of call back after open UI text dialog
+		level.start_stop_menu(storageViewer,true)
 	end
 end
  

@@ -1,18 +1,17 @@
 ------ Text Box CUI class ------
 
 class "ZStashInputDialog" (CUIScriptWnd)
-function ZStashInputDialog:__init(prompt_text, current_text, object_id, parent_class, process_func) super()
+function ZStashInputDialog:__init(prompt_text, current_text, callback_func, args_table) super()
 	self.prompt_text = prompt_text
 	self.current_text = current_text
-	self.current_stash_id = object_id
-	self.parent_class = parent_class or nil
-	self.process_func = process_func
+	self.callback_func = callback_func
+	self.args = args_table
 	self.enter_pressed_in_editbox = false
 
 	self:InitControls()
 	self:InitCallBacks()
 	self.caption_static:SetText(self.prompt_text)
-	if self.process_func == "rename" then self.edit_box:SetText(self.current_text) end
+	if string.len(self.current_text) > 0 then self.edit_box:SetText(self.current_text) end
 end
 
 function ZStashInputDialog:InitControls()
@@ -51,23 +50,30 @@ function ZStashInputDialog:OnButton_OK_Clicked()
 	local entered_text = self.edit_box:GetText()
 	self:GetHolder():start_stop_menu(self, true) -- Close this dialog
 
-	if string.len(entered_text) ~= 0 or self.process_func == "add" then -- Skip if empty string closing the dialog box
-		local search_results = zstash_logic.ProcessStashNameInput(self.process_func, entered_text, self.current_stash_id, true)
-		if self.parent_class then
-			if self.process_func == "rename" then
-				self.parent_class:UpdateList()
-			elseif self.process_func == "search" then
-				self.parent_class:SearchResult(entered_text, search_results)
-			else
-				zstash_logic.debug_log("Invalid process_func on Confirmation!!!")
-			end
-		end
+	if type(self.args) ~= "table" then
+		zstash_logic.debug_log("ZStash_Input:OnButton_OK_Clicked() : self.args not a table!!!")
+		return
 	end
+
+	table.insert(self.args, entered_text) -- Always return the entered input text
+
+	if self.callback_func == zstash_logic.AddZStashName then
+		local confirmed = true
+		table.insert(self.args, confirmed)
+	end
+
+	return self.callback_func(unpack(self.args))
 end
 
 function ZStashInputDialog:OnButton_Cancel_Clicked()
 	self:GetHolder():start_stop_menu(self, true) -- Close this dialog
-	zstash_logic.ProcessStashNameInput(self.process_func, nil, self.current_stash_id, false) -- Pass nil and failure/cancel flag
+
+	if self.callback_func == zstash_logic.AddZStashName then
+		local confirmed = false
+		table.insert(self.args, "") -- Insert a empty string to maintain args order for the callback func
+		table.insert(self.args, confirmed)
+		return self.callback_func(unpack(self.args))
+	end
 end
 
 function ZStashInputDialog:OnKeyboard(dik, keyboard_action)

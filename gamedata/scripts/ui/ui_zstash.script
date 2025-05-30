@@ -336,9 +336,13 @@ end
 
 -- Search Item in Linked Stashes
 function ZStashMenu:on_search()
-	local process_func = "search"
-	local input_dialog = ui_zstash_input.ZStashInputDialog("Search for an item in the Linked Stashes:" , "", nil, self, "search")
-    
+	local context_header = "Search for an item in the Linked Stashes:"
+	local input_dialog = ui_zstash_input.ZStashInputDialog(context_header ,
+						"", 
+						zstash_logic.FindItemLinkedStashes,
+						{self, self.stash_list}
+						)
+	
     local ir_wnd = level.main_input_receiver()
     if ir_wnd then
         ir_wnd:GetHolder():start_stop_menu(input_dialog, true)
@@ -371,7 +375,11 @@ function ZStashMenu:on_rename()
 	-- Rename the stash
 	local current_name = item.stash_name
 	local process_func = "rename"
-	local input_dialog = ui_zstash_input.ZStashInputDialog("Rename the linked stash [" .. item.stash_name .."]:" , current_name, item.sid, self, process_func)
+	local input_dialog = ui_zstash_input.ZStashInputDialog("Rename the linked stash [" .. item.stash_name .."]:" ,
+						 current_name, 
+						 zstash_logic.RenameZStashSpot, 
+						 {self,item.sid}
+						)
     
     local ir_wnd = level.main_input_receiver()
     if ir_wnd then

@@ -14,25 +14,19 @@ local original_StorageViewer_CloseViewer = nil -- For patching CloseViewer
 local original_StorageViewer_TakeAllFromStorage = nil -- For patching TakeAllFromStorage
 local original_StorageViewer_confirm_change_tool_ui = nil -- For patching confirm_change_tool_ui
 
-local debug = true
-function debug_log(str,...)
-	if debug then
-		log("Z Remote Stash:debug: "..str,...)
-	end
-end
 
 function OpenRemoteStashView(target_object_id)
-    debug_log("RemoteStashManager: Attempting to open remote view for object ID: %s", target_object_id)
+    zstash_logic.debug_log("RemoteStashManager: Attempting to open remote view for object ID: %s", target_object_id)
 
     if RemoteStashManager.is_remote_access_active then
-        debug_log("! WARNING: Remote access is already active. Aborting new request.")
+        zstash_logic.debug_log("! WARNING: Remote access is already active. Aborting new request.")
         return
     end
 
     local remote_storage_id_key = "storage_" .. target_object_id
 
     if not keyvals("storages") or not keyvals("storages_config") then
-        debug_log("! ERROR: Keyvals system not found or accessible.")
+        zstash_logic.debug_log("! ERROR: Keyvals system not found or accessible.")
         return
     end
 
@@ -40,7 +34,7 @@ function OpenRemoteStashView(target_object_id)
     local original_config = keyvals("storages_config"):get(remote_storage_id_key, nil)
 
     if original_data == nil then
-        debug_log("! ERROR: No data found in keyvals for storage ID: %s", remote_storage_id_key)
+        zstash_logic.debug_log("! ERROR: No data found in keyvals for storage ID: %s", remote_storage_id_key)
         return
     end
 
@@ -50,18 +44,18 @@ function OpenRemoteStashView(target_object_id)
     RemoteStashManager.active_storage_data = table.deep_copy(original_data)
     RemoteStashManager.active_storage_config = table.deep_copy(original_config or {}) -- Ensure config is a table
 
-    debug_log("RemoteStashManager: Copied data for %s.", remote_storage_id_key)
+    zstash_logic.debug_log("RemoteStashManager: Copied data for %s.", remote_storage_id_key)
 
     PatchAndLaunchStashUI()
 end
 
 function PatchAndLaunchStashUI()
     if not RemoteStashManager.is_remote_access_active then
-        debug_log("! ERROR: PatchAndLaunchStashUI called when remote access is not active.")
+        zstash_logic.debug_log("! ERROR: PatchAndLaunchStashUI called when remote access is not active.")
         return
     end
 
-    debug_log("RemoteStashManager: Patching keyvals and CloseViewer...")
+    zstash_logic.debug_log("RemoteStashManager: Patching keyvals and CloseViewer...")
 
     -- 1. Patch keyvals("storages"):get()
     if not original_keyvals_storages_get then -- Patch only if not already patched
@@ -69,7 +63,7 @@ function PatchAndLaunchStashUI()
     end
     keyvals("storages").get = function(self_keyvals, storage_id_param, default_value)
         if RemoteStashManager.is_remote_access_active and storage_id_param == RemoteStashManager.current_remote_storage_id then
-            debug_log("Remote Access (keyvals storages.get): Providing active_storage_data for UI for %s", storage_id_param)
+            zstash_logic.debug_log("Remote Access (keyvals storages.get): Providing active_storage_data for UI for %s", storage_id_param)
             return RemoteStashManager.active_storage_data
         else
             return original_keyvals_storages_get(self_keyvals, storage_id_param, default_value)
@@ -82,7 +76,7 @@ function PatchAndLaunchStashUI()
     end
     keyvals("storages_config").get = function(self_keyvals_cfg, storage_id_param, default_value)
         if RemoteStashManager.is_remote_access_active and storage_id_param == RemoteStashManager.current_remote_storage_id then
-             debug_log("Remote Access (keyvals storages_config.get): Providing active_storage_config for UI for %s", storage_id_param)
+             zstash_logic.debug_log("Remote Access (keyvals storages_config.get): Providing active_storage_config for UI for %s", storage_id_param)
              return RemoteStashManager.active_storage_config
         else
             return original_keyvals_storages_config_get(self_keyvals_cfg, storage_id_param, default_value)
@@ -100,7 +94,7 @@ function PatchAndLaunchStashUI()
            viewer_instance.binderObject and -- Ensure binderObject exists
            viewer_instance.binderObject.storageID == RemoteStashManager.current_remote_storage_id then
 
-            debug_log("RemoteStashManager: Intercepted CloseViewer for remote stash %s", RemoteStashManager.current_remote_storage_id)
+            zstash_logic.debug_log("RemoteStashManager: Intercepted CloseViewer for remote stash %s", RemoteStashManager.current_remote_storage_id)
             -- The data inside viewer_instance.storage_data IS our RemoteStashManager.active_storage_data
             -- because of the keyvals.get patch.
             RemoteStashManager.active_storage_data = table.deep_copy(viewer_instance.storage_data) -- Ensure we have the latest reference from UI
@@ -113,7 +107,7 @@ function PatchAndLaunchStashUI()
             disable_info("biznes_remove_special_item")
             disable_info("save_prohibited")
             give_info("ui_rukzak_hide")
-            debug_log("RemoteStashManager: Remote UI closed and data saved.")
+            zstash_logic.debug_log("RemoteStashManager: Remote UI closed and data saved.")
             ReopenZStashMenu() -- Re-Open the z stash menu after closing the storage viewer
         else
             -- Not our remote session, or some other issue, call original
@@ -131,7 +125,7 @@ function PatchAndLaunchStashUI()
            viewer_instance.binderObject and -- Ensure binderObject exists
            viewer_instance.binderObject.storageID == RemoteStashManager.current_remote_storage_id then
 
-           -- Prevent Player to take all button from stash remotely
+           -- Prevent Player to Take all from stash remotely
            local message = "%c[0,255,0,1]WARNING!!!%c[default] You cannot remove the player stash remotely using the Remote Access Tool!"
            viewer_instance:ShowMessageBox(message)
 
@@ -151,7 +145,7 @@ function PatchAndLaunchStashUI()
            viewer_instance.binderObject.storageID == RemoteStashManager.current_remote_storage_id then
 
            -- Prevent from changing stash UI remotely
-           local message = "%c[0,255,0,1]WARNING!!!%c[default] You cannot change the stash UI Remotely using the Remote Access Tool!!! [Not recommended, Icon UI is outdated and should not be used]!"
+           local message = "%c[0,255,0,1]WARNING!!!%c[default] You cannot change the stash UI Remotely using the Remote Access Tool!!!"
            viewer_instance:ShowMessageBox(message)
 
         else
@@ -162,22 +156,23 @@ function PatchAndLaunchStashUI()
     -- 6. Create the fake binder object for the UI
     local fake_binder_for_ui = {
         storageID = RemoteStashManager.current_remote_storage_id
-        -- No 'object' field needed as the UI parts we care about for remote access
-        -- (data loading/saving) primarily use storageID.
+        -- StorageViewer.Init takes in binderObject but only reads its member variables and no function calls are made
+        -- We substitute BinderObject with a table holding the storageID which will act as fake member for the BinderObject
+        -- StorageVierwer.Init will reference this table with self.binderObject.storageID where self is our fake_binder_for_ui
         -- The patched CloseViewer will handle the map spot issue.
     }
 
     -- 7. Instantiate and show the StorageViewer UI
-    debug_log("RemoteStashManager: Instantiating safe_StorageViewer.StorageViewer with fake binder for %s", fake_binder_for_ui.storageID)
+    zstash_logic.debug_log("RemoteStashManager: Instantiating safe_StorageViewer.StorageViewer with fake binder for %s", fake_binder_for_ui.storageID)
     local storageViewerInstance = safe_StorageViewer.StorageViewer(fake_binder_for_ui)
 
     if not storageViewerInstance then
-        debug_log("! ERROR: Failed to create safe_StorageViewer.StorageViewer instance.")
+        zstash_logic.debug_log("! ERROR: Failed to create safe_StorageViewer.StorageViewer instance.")
         RestorePatchesAndCleanup() -- Cleanup if UI creation fails
         return
     end
 
-    debug_log("RemoteStashManager: Showing remote stash UI.")
+    zstash_logic.debug_log("RemoteStashManager: Showing remote stash UI.")
     local ir_wnd = level.main_input_receiver()
     if ir_wnd then
         ir_wnd:GetHolder():start_stop_menu(storageViewerInstance, true)
@@ -189,7 +184,7 @@ end
 
 function SaveChangesAndCleanup()
     if RemoteStashManager.is_remote_access_active and RemoteStashManager.current_remote_storage_id and RemoteStashManager.active_storage_data then
-        debug_log("RemoteStashManager: 'Committing' changes for %s.", RemoteStashManager.current_remote_storage_id)
+        zstash_logic.debug_log("RemoteStashManager: 'Committing' changes for %s.", RemoteStashManager.current_remote_storage_id)
 
         local live_storage_table_ref = keyvals("storages"):get(RemoteStashManager.current_remote_storage_id, nil)
         local live_config_table_ref = keyvals("storages_config"):get(RemoteStashManager.current_remote_storage_id, nil)
@@ -197,9 +192,9 @@ function SaveChangesAndCleanup()
         if live_storage_table_ref then
             -- Clear the existing live table's contents
             live_storage_table_ref = table.deep_copy(RemoteStashManager.active_storage_data)
-            debug_log("RemoteStashManager: Storage data for %s updated by replacing content of live reference.", RemoteStashManager.current_remote_storage_id)
+            zstash_logic.debug_log("RemoteStashManager: Storage data for %s updated by replacing content of live reference.", RemoteStashManager.current_remote_storage_id)
         else
-            debug_log("! CRITICAL WARNING: Could not get live reference for storage %s via keyvals().get(). Stash data changes will NOT be saved by this method.", RemoteStashManager.current_remote_storage_id)
+            zstash_logic.debug_log("! CRITICAL WARNING: Could not get live reference for storage %s via keyvals().get(). Stash data changes will NOT be saved by this method.", RemoteStashManager.current_remote_storage_id)
             -- This scenario would imply the stash ID was new and keyvals().get() doesn't create it,
             -- or the ID somehow became invalid.
         end
@@ -207,20 +202,20 @@ function SaveChangesAndCleanup()
         -- Handle config similarly
         if live_config_table_ref and type(RemoteStashManager.active_storage_config) == "table" then
             live_config_table_ref = table.deep_copy(RemoteStashManager.active_storage_config)
-            debug_log("RemoteStashManager: Storage config for %s updated.", RemoteStashManager.current_remote_storage_id)
+            zstash_logic.debug_log("RemoteStashManager: Storage config for %s updated.", RemoteStashManager.current_remote_storage_id)
         elseif type(RemoteStashManager.active_storage_config) == "table" then
-             debug_log("! WARNING: Could not get live reference for config %s or active_storage_config is not a table. Config changes might not be saved.", RemoteStashManager.current_remote_storage_id)
+             zstash_logic.debug_log("! WARNING: Could not get live reference for config %s or active_storage_config is not a table. Config changes might not be saved.", RemoteStashManager.current_remote_storage_id)
         end
     else
         if RemoteStashManager.is_remote_access_active then
-            debug_log("RemoteStashManager: SaveChangesAndCleanup called, but no active data to save or invalid state.")
+            zstash_logic.debug_log("RemoteStashManager: SaveChangesAndCleanup called, but no active data to save or invalid state.")
         end
     end
     RestorePatchesAndCleanup() -- This must always be called
 end
 
 function RestorePatchesAndCleanup()
-    debug_log("RemoteStashManager: Restoring patched functions and cleaning up state.")
+    zstash_logic.debug_log("RemoteStashManager: Restoring patched functions and cleaning up state.")
     -- Restore patched functions
     if original_keyvals_storages_get then
         keyvals("storages").get = original_keyvals_storages_get
