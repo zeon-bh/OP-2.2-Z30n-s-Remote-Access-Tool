@@ -1,34 +1,51 @@
 
-# Z30n's Remote Access Tool
+# Z30n's Remote Access Tool (v1.2)
 
-A small mod item for Stalker OP-2.2 or Cumulative Pack 2.2 that allow a player to access/view/search items in player created stashes remotely from any map in the zone using a simple GUI Interface.
-
+A small mod for Stalker OP-2.2 or Cumulative Pack 2.2 that allows a player to access,view and search items in player created stashes remotely from any map in the zone using a simple GUI Interface. The GUI has support for English, Russian, Ukranian, French and Polish languages.
 
 ## Installation
+
+**DISCLAIMER:** ALWAYS MAKE BACKUPS OF YOUR SAVE FILES AND GAMEDATA FOLDER(IF YOU HAVE PREVIOUSLY INSTALLED SOME MODS). THIS GAME IS NOTORIOUS FOR BREAKING YOUR SAVE FOR RANDOM REASONS, ESPECIALLY IF YOU ARE MODDING. YOU HAVE BEEN WARNED!!!
+
 1. Download the zip file from the Github Repository.
 2. Extract the files to your OP-2.2 game directory.
 3. After extracting the zip files you should have a gamedata folder and an fsgame.ltx file (If you do not have any mods installed previously) inside your OP-2.2 installed directory.
-4. The zip file includes anti-cheat disable so you don't have to worry about the achievements. (If you are going for the S.T.A.L.K.E.R achievement then you should be fine. Good Luck Stalker!)
+4. The zip file includes anti-cheat disable.
+
 ## File Conflicts
 If you have any other previous mods installed in your OP-2.2 game directory, make sure to check which files are over written by this mod.
 
-The files that would most likely have conflicts are:
+The files that MUST be overwritten are:
 
-    1. ui_icon_equipment.dds
-    2. binder_safe.script
+    1. binder_safe.script
+    2. callback_use.script
+    3. key_handlers.script
+    4. portable_charger.ltx
 
-THESE FILES SHOULD ABSOLUTELY MUST BE OVERWRITTEN OR THE MOD WILL NOT WORK!!!
+**THESE FILES SHOULD ABSOLUTELY MUST BE OVERWRITTEN OR THE MOD WILL NOT WORK!!!**
+
+If you are using custom icons then you can ignore ui_icon_equipment.dds, but doing so will display a broken or missing icon for the Remote Access Tool. Other than the missing icon the item should work as intended.
 
 If you have installed the OP-2.2 English and Russian translation mod by StormTetris:
 https://github.com/StormTetris/English-Ukrainian-OP2.2/tree/main  
-You do not have to worry about the files being overwritten.
+You do not have to worry about the .xml files being overwritten. In this case the files are:  
+
+    1. items.xml
+    2. sms_other.xml
+    3. ui.xml
 
 ## Remote Access Tool
+To obtain the Remote Access Tool simply press **LEFT SHIFT + SEMICOLON(;)** to spawn the Remote Access Tool into your inventory. You should get a popup message.
+
 Once you have obtained the Remote Access tool, you need to first add your stashes to the Remote Accesss Tool list to open them remotely.
 
-Opening the stashes using the Remote Access Tool requires you to have a Teleport Artefact with enough minimum condition. The Teleport Uses in the top right indicates how many times you can open your stash remotely. A single Teleport artifact has around ~10 uses.
+Opening the stashes using the Remote Access Tool requires you to have a Teleport Artefact with enough minimum condition. The Teleport Uses in the top right indicates how many times you can open your stash remotely. By default a single Teleport artifact has around ~10 uses.
 
-Stolen Stashes cannot be opened with the Remote Access Tool and must be retrieved to access the stash remotely.
+The Teleport uses can be changed in the zstash_configs.script file. You can set your prefered preset value.
+
+Stolen Stashes cannot be opened with the Remote Access Tool. You must be retrieve the stolen stash to get access to the stash remotely.
+
+Stashes cannot be opened remotely during a blowout for balance and for safety reasons, to avoid data corruption on your save file.
 
 #### A. Adding and renaming a stash using the Remote Access Tool
 1. To add a new or an existing stash open the stash directly and you should see a popup dialog box. Enter the name of your stash into the dialog box. (If you leave it empty the stash name will be set to a default name based on which map the stash is placed). If you do not want to add the stash to the Remote Access tool and just want to open the stash then just hit Cancel and you should be able to access the stash normally.
@@ -74,6 +91,7 @@ Stolen Stashes cannot be opened with the Remote Access Tool and must be retrieve
 </p>
 
 #### C. Searching for an item using Remote Access Tool
+**As of v1.2 the search function only works properly if your game is running in English localization. Other localizations might have mixed or downright broken search results.**
 
 1. The Remote Access Tool has an in-built search function which allows you to search for an item from all of your linked stashes. Let's say you want to search for an item named dummy.
 
@@ -95,4 +113,5 @@ Stolen Stashes cannot be opened with the Remote Access Tool and must be retrieve
 
 ## Credits
 AMK Team, OP-2.2 or Cumulative Pack 2.2<br/>
-StormTetris, English-Ukrainian-OP2.2 Translation mod and anti-cheat disabler
+StormTetris, English-Ukrainian-OP2.2 Translation mod and anti-cheat disabler<br/>
+Translations done by Google Gemini 2.5 Pro Exp
