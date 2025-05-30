@@ -4,7 +4,16 @@ local def_color={255,216,186,140}
 local sel_color={255,0,150,100}
 local cur_color={255,255,0,0}
 
-local DEPLETE_RATE = 0.095 -- Decrease by ~10% after every use
+-- Remote Access Tool Teleport Uses preset
+local Preset_setting = {
+	[0] = 0.99,
+	[1] = 1.98,
+	[2] = 3.96,
+	[3] = 9.9,
+	[4] = 33,
+	[5] = 99
+}
+local DEPLETE_RATE = Preset_setting[zstash_configs.RAT_PRESET] or 10 -- Defaults to balanced rate
 local TELEPORT_SAFETY_THRESHOLD = 1 -- Limit at which Teleport artifacts cannot be used for opening remote stashes
 
 class "StashData" (CUIListItemEx)
@@ -48,7 +57,11 @@ function ZStashMenu:InitControls()
 	self.dialog	= xml:InitStatic("main_dialog:dialog", self)
 	xml:InitStatic("main_dialog:capt", self.dialog)
 	xml:InitStatic("main_dialog:msg1", self.dialog)
+
+	-- Teleport Uses
 	self.tele_uses = xml:InitStatic("main_dialog:tele_uses", self.dialog)
+	self.tele_uses:SetText(translate("ui_zstash_teleport_uses"))
+	self.tele_num = xml:InitStatic("main_dialog:tele_num", self.dialog)
 
 	-- Preview list window
 	self.stash_preview_panel = xml:InitFrame("stash_preview_panel", self)
@@ -60,7 +73,7 @@ function ZStashMenu:InitControls()
 
 	-- Search Linked Stashes
 	self.btn_search = CUIButton()
-	self.btn_search:Init(420, 120, 16, 16)
+	self.btn_search:Init(320, 120, 16, 16)
 	self.btn_search:InitTexture("ui\\ui_magnifier")
 	self.btn_search:SetOriginalRect(0, 0, 16, 16)
 	self.btn_search:SetStretchTexture(false)
@@ -167,7 +180,7 @@ function ZStashMenu:ItemClicked()
 			self.stash_preview_panel.stash_text_content:SetText(preview_str)
 			self.stash_preview_panel.stash_content_scroll_area:ScrollToBegin() -- Scroll to top after updating
         else
-            self.stash_preview_panel.stash_text_content:SetText("Error: Stash ID not found for preview.")
+            self.stash_preview_panel.stash_text_content:SetText(translate("ui_zstash_preview_invalid"))
         end
     else
         self.stash_preview_panel.stash_text_content:SetText("") -- Clear preview if item is somehow nil
@@ -183,7 +196,7 @@ function ZStashMenu:GenerateStashPreview(stash_object_id)
     local show_item_weight = false
 
     if not stash_data or table.size(stash_data) == 0 then
-        return translate("Remote Linked Stash is Empty!!!") -- Or "Stash is empty"
+        return translate("ui_zstash_stash_empty") -- Or "Stash is empty"
     end
 
     local systemIniReader = ini_reader.iniReader()
@@ -336,19 +349,21 @@ end
 
 -- Search Item in Linked Stashes
 function ZStashMenu:on_search()
-	local context_header = "Search for an item in the Linked Stashes:"
-	local input_dialog = ui_zstash_input.ZStashInputDialog(context_header ,
-						"", 
-						zstash_logic.FindItemLinkedStashes,
-						{self, self.stash_list}
-						)
-	
-    local ir_wnd = level.main_input_receiver()
-    if ir_wnd then
-        ir_wnd:GetHolder():start_stop_menu(input_dialog, true)
-    else
-        level.start_stop_menu(input_dialog, true)
-    end
+	if table.size(self.stash_list) ~= 0 then
+		local context_header = translate("ui_zstash_search_dialog")
+		local input_dialog = ui_zstash_input.ZStashInputDialog(context_header ,
+							"", 
+							zstash_logic.FindItemLinkedStashes,
+							{self, self.stash_list}
+							)
+		
+		local ir_wnd = level.main_input_receiver()
+		if ir_wnd then
+			ir_wnd:GetHolder():start_stop_menu(input_dialog, true)
+		else
+			level.start_stop_menu(input_dialog, true)
+		end
+	end
 end
 
 -- Rename Linked Stashes
@@ -366,16 +381,14 @@ function ZStashMenu:on_rename()
 
 	-- Check if actor is in combat state
 	if db.actor:enemy_see_actor() then
-		local zstash_str = "%%c[0,255,0,1]REMOTE ACCESS TOOL%%c[default]: Cannot rename the remote stash during combat!"
-        local text_sms = string.extformat(translate(zstash_str))
-        sms(text_sms, nil, "nano", 5000)
+        sms(translate("sms_zstash_label").." "..translate("sms_zstash_combat_rename"), nil, "nano", 5000)
 		self:on_quit()
 	end
 
 	-- Rename the stash
+	local rename_context = translate("ui_zstash_rename_dialog")
 	local current_name = item.stash_name
-	local process_func = "rename"
-	local input_dialog = ui_zstash_input.ZStashInputDialog("Rename the linked stash [" .. item.stash_name .."]:" ,
+	local input_dialog = ui_zstash_input.ZStashInputDialog(rename_context.." [" .. item.stash_name .."]:" ,
 						 current_name, 
 						 zstash_logic.RenameZStashSpot, 
 						 {self,item.sid}
@@ -398,45 +411,47 @@ function ZStashMenu:on_ok()
 
 	if not item or not item.sid then return end
 
-	-- Remote Access Tool Balance checks
+	----- Remote Access Tool Balance checks -----
+
+	-- Disable During Blowout -- Not necessarily required but just a safety check to avoid save corruption during blowout
+	-- DO NOT EVER DISABLE THIS AS BLOWOUT SCRIPT CAN HAVE UNINTENDED AND UNPREDICTABLE CONSEQUENCES WHILE WRITING TO CONTAINERS
+	local blowout = (get_value("blowout",-1) > -1) and (get_value("blowout",-1) < 6)
+	if blowout then
+        sms(translate("sms_zstash_label").." "..translate("sms_zstash_blowout"), nil, "nano", 5000)
+		self:on_quit()
+		return
+	end
 
 	-- Check if stash is stolen
 	if safe_StealManager.GetStealManagerClass():IsStolen(item.sid) then
-		local zstash_str = "%%c[0,255,0,1]REMOTE ACCESS TOOL%%c[default]: Cannot open the remote stash, Your Stash has been stolen and cannot be accessed until retrieved!"
-        local text_sms = string.extformat(translate(zstash_str))
-        sms(text_sms, nil, "nano", 5000)
+        sms(translate("sms_zstash_label").." "..translate("sms_zstash_stolen"), nil, "nano", 5000)
 		self:on_quit()
 		return
 	end
 
 	-- Check if actor is in combat state
 	if db.actor:enemy_see_actor() then
-		local zstash_str = "%%c[0,255,0,1]REMOTE ACCESS TOOL%%c[default]: Cannot open the remote stash during combat!"
-        local text_sms = string.extformat(translate(zstash_str))
-        sms(text_sms, nil, "nano", 5000)
+        sms(translate("sms_zstash_label").." "..translate("sms_zstash_combat_open"), nil, "nano", 5000)
 		self:on_quit()
 	end
 
 	if table.size(self.teleport_artifacts.teleport) == 0 then
-		-- cannot open stash
-		local zstash_str = "%%c[0,255,0,1]REMOTE ACCESS TOOL%%c[default]: Cannot open the remote stash, no available teleport artifacts in the inventory!"
-        local text_sms = string.extformat(translate(zstash_str))
-        sms(text_sms, nil, "nano", 5000)
+		-- No teleport artifacts in inventory
+        sms(translate("sms_zstash_label").." "..translate("sms_zstash_no_teleport"), nil, "nano", 5000)
 		self:on_quit()
 	else
 		if self.teleport_artifacts.selected_artifact then
 			local artifact_obj = self.teleport_artifacts.selected_artifact.obj
 
 			-- Set the new Teleport artifact condition after use
-			artifact_obj:set_condition(artifact_obj:condition() - DEPLETE_RATE)
+			local art_update_cond = (artifact_obj:condition() - (DEPLETE_RATE * 0.01)) or 0.01
+			artifact_obj:set_condition(art_update_cond)
 			-- Start the remote stash session
 			self:on_quit()
 			zstash_remote_manager.OpenRemoteStashView(item.sid)
 		else
 			-- Teleport Artefacts have no charge left
-			local zstash_str = "%%c[0,255,0,1]REMOTE ACCESS TOOL%%c[default]: Cannot open the remote stash, The available Teleport Artifacts do not have sufficient charge to open a remote connection to the linked stash!"
-			local text_sms = string.extformat(translate(zstash_str))
-			sms(text_sms, nil, "nano", 5000)
+			sms(translate("sms_zstash_label").." "..translate("sms_zstash_teleport_condition"), nil, "nano", 5000)
 			self:on_quit()
 		end
 	end
@@ -469,7 +484,7 @@ function ZStashMenu:InitTeleport()
 	db.actor:iterate_ruck(function(item)
 		if item then
 			if item:section() == "af_teleport" then
-				table.insert(teleport_artifacts.teleport, {uid = item:id(), uses = math.ceil(item:condition() / DEPLETE_RATE) - TELEPORT_SAFETY_THRESHOLD, obj = item})
+				table.insert(teleport_artifacts.teleport, {uid = item:id(), uses = math.floor((item:condition() * 100) / DEPLETE_RATE), obj = item})
 			end
 		end
 	end)
@@ -487,7 +502,7 @@ function ZStashMenu:InitTeleport()
 	-- Select the teleport artifact with lowest uses greater than TELEPORT_THRESHOLD and calculate total uses
 	local total_uses = 0
 	for _,art in pairs(teleport_artifacts.teleport) do
-		if art.uses > 0 and not teleport_artifacts.selected_artifact then -- If current artifact is depleted skip to next one
+		if art.uses >= 1 and not teleport_artifacts.selected_artifact then -- If current artifact is depleted skip to next one
 			teleport_artifacts.selected_artifact = art
 			zstash_logic.debug_log("SELECTED ARTIFACT | UID = %d | USES = %d", art.uid, art.uses)
 		end
@@ -496,27 +511,27 @@ function ZStashMenu:InitTeleport()
 
 	-- Set the header text in the menu to display teleport artifact total uses if available
 	local getTeleportText = function()
-		local condition_text = ""
+		local condition_num = ""
 		if table.size(teleport_artifacts.teleport) == 0 then
-			local no_artifacts = "%c[0,255,0,1]N/A%c[default]" -- 0 Uses
-			condition_text = no_artifacts
+			local no_artifacts = "%c[0,255,0,1]N/A%c[default]" -- No Artifacts Available
+			condition_num = no_artifacts
 		else
 			local artifacts_num = table.size(teleport_artifacts.teleport)
-			local max_uses = (math.ceil(1 / DEPLETE_RATE) - TELEPORT_SAFETY_THRESHOLD) * artifacts_num
+			local max_uses = math.floor(100 / DEPLETE_RATE) * artifacts_num
 			local total_uses = 0
 			for _,art in ipairs(teleport_artifacts.teleport) do
 				total_uses = total_uses + art.uses
 			end
-			local green_channel = math.floor(255 * (total_uses/max_uses))
+			local green_channel = 255 * (total_uses/max_uses)
 			local red_channel = 255 - green_channel
 			local color_code = string.format("[0,%d,%d,1]", red_channel,green_channel)
-			condition_text = string.format("%%c%s%d%%c[default]", color_code, total_uses)
+			condition_num = string.format("%%c%s%d%%c[default]", color_code, total_uses)
 		end
-		return string.extformat("Teleport Uses: %s", condition_text)
+		return condition_num
     end
 
 	-- Display the total uses if availabe or N/A
-	self.tele_uses:SetText(getTeleportText())
+	self.tele_num:SetText(getTeleportText())
 	self.teleport_artifacts = teleport_artifacts
 end
 
@@ -546,10 +561,11 @@ function ZStashMenu:SearchResult(search_item, search_results)
 			result_str = string.format("%s\\n%s", result_str,new_result_str)
 		end
 	else
-		result_str = string.format("%s not found in any of the Linked Stashes!!!", search_item)
+		result_str = search_item.." "..translate("ui_zstash_search_empty")
 	end
 	
-	local search_window_caption = string.format("Search Results for [%s]:", search_item)
+	--local search_window_caption = string.format("Search Results for [%s]:", search_item)
+	local search_window_caption = translate("ui_zstash_search_caption").." ["..search_item.."]:"
 
 	self.stash_search_panel.stash_search_caption:SetText(search_window_caption)
 	self.stash_search_panel.stash_text_search:SetText(result_str)
