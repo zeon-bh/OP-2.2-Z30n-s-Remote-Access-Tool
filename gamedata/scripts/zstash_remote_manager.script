@@ -126,8 +126,7 @@ function PatchAndLaunchStashUI()
            viewer_instance.binderObject.storageID == RemoteStashManager.current_remote_storage_id then
 
            -- Prevent Player to Take all from stash remotely
-           local message = "%c[0,255,0,1]WARNING!!!%c[default] You cannot remove the player stash remotely using the Remote Access Tool!"
-           viewer_instance:ShowMessageBox(message)
+           viewer_instance:ShowMessageBox(translate("ui_zstash_take_all"))
 
         else
            return original_StorageViewer_TakeAllFromStorage(viewer_instance)
@@ -145,8 +144,7 @@ function PatchAndLaunchStashUI()
            viewer_instance.binderObject.storageID == RemoteStashManager.current_remote_storage_id then
 
            -- Prevent from changing stash UI remotely
-           local message = "%c[0,255,0,1]WARNING!!!%c[default] You cannot change the stash UI Remotely using the Remote Access Tool!!!"
-           viewer_instance:ShowMessageBox(message)
+           viewer_instance:ShowMessageBox(translate("ui_zstash_ui_change"))
 
         else
            return original_StorageViewer_confirm_change_tool_ui(viewer_instance)

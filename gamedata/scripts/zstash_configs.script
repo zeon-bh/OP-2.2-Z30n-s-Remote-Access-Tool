@@ -1,0 +1,9 @@
+--- Remote Access Tool Configs ---
+
+-- RAT Preset  = 0   Baby Mode (100 Uses per Teleport)}
+--             = 1   Very Easy (50 Uses per Teleport)}
+--             = 2   Easy (25 Uses per Teleport)}
+--             = 3   Balanced (10 Uses per Teleport)}
+--             = 4   Hard (3 Uses per Teleport)}
+--             = 5   Nightmare (1 Use per Teleport)
+RAT_PRESET = 3
