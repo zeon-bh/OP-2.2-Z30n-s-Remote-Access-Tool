@@ -84,20 +84,8 @@ local keys={
 		[DIK_keys.DIK_SEMICOLON]={
 			func=function(key,action)
 				if zstash_logic and shift_state then
-					local spawn_item = "zstash"
-					local zstash_exists = false
-					db.actor:iterate_ruck(function(item)
-						if item then
-							if item:section() == spawn_item then
-								zstash_exists = true
-							end
-						end
-					end)
-					if not zstash_exists then
-						create(spawn_item,db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id(), db.actor:id())
-						create("af_teleport",db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id(), db.actor:id())
-						sms(translate("sms_zstash_label").." "..translate("sms_zstash_spawned"), nil, "nano", 7500)
-					end
+					-- Add the Remote Access Tool + Teleport Artifact(1) to the player inventory
+					zstash_logic.SpawnZStashDevice()
 				end
 			end
 		}, 

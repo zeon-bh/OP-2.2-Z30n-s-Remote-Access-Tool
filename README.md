@@ -46,6 +46,8 @@ Opening the stashes using the Remote Access Tool requires you to have a Teleport
 
 The Teleport uses can be changed in the zstash_configs.script file. You can set your prefered preset value.
 
+**Used Teleport Artifacts can still be used by the Handheld Universal Teleporter!**
+
 Stolen Stashes cannot be opened with the Remote Access Tool. You must retrieve the stolen stash to get access to the stash remotely.
 
 Stashes cannot be opened remotely during a blowout for balance and for safety reasons, to avoid data corruption on your save file.
@@ -54,34 +56,34 @@ Stashes cannot be opened remotely during a blowout for balance and for safety re
 1. To add a new or an existing stash open the stash directly and you should see a popup dialog box. Enter the name of your stash into the dialog box. (If you leave it empty the stash name will be set to a default name based on which map the stash is placed). If you do not want to add the stash to the Remote Access tool and just want to open the stash then just hit Cancel and you should be able to access the stash normally.
 
 <p align="center">
-  <img width="426" height="240" src="https://www.dropbox.com/scl/fi/bs4vmv7ye5mwwvzspn5ez/RAT_add_rename_01.jpg?rlkey=9kbpu3s1f9oq7rytcpatheck0&st=0uscmxxq&raw=1">
-  <img width="426" height="240" src="https://www.dropbox.com/scl/fi/9i9r5xfgh205sx3v2fdcn/RAT_add_rename_02.jpg?rlkey=rcq8zx8yh67zkqg90pzapbt3v&st=jmtr6v8h&raw=1">
+  <img width="426" height="240" src="https://www.dropbox.com/scl/fi/ibkvj488fq6vp31u6g200/RAT_ADD_01.jpg?rlkey=fc0sx5v6nld2lj8vmfynik2jb&st=9shazrvn&raw=1">
+  <img width="426" height="240" src="https://www.dropbox.com/scl/fi/47jkre6ye7oqujglkqs02/RAT_ADD_02.jpg?rlkey=4z652xrdkt24y4wg4rw88dbdw&st=7nr05ch3&raw=1">
 </p>
 
 2. Once you have entered the name and clicked OK, you should get a message informing you about the addition of new stash to the Remote Access Tool. You can open your PDA and check the stash map spot and verify the name and the status of the link to your Remote Access Tool.
 
 <p align="center">
-  <img width="426" height="240" src="https://www.dropbox.com/scl/fi/8upf03pxa7fdikz8xq123/RAT_add_rename_03.jpg?rlkey=o5wtmd6eqdioiz5f3ovtzyh63&st=iynpv2xp&raw=1">
-  <img width="426" height="240" src="https://www.dropbox.com/scl/fi/h6te0md3e9qwoildqimpm/RAT_add_rename_04.jpg?rlkey=l8j4mhwp30dtlt9frvztwx05k&st=b18t7d11&raw=1">
+  <img width="426" height="240" src="https://www.dropbox.com/scl/fi/s1phbirzzrvu33kg1ifhm/RAT_ADD_03.jpg?rlkey=fxbalnzkdp2jqckjodw7uv9ni&st=c3ws8e1s&raw=1">
+  <img width="426" height="240" src="https://www.dropbox.com/scl/fi/munbiow2ykevgxaolff79/RAT_ADD_04.jpg?rlkey=exh79oe9zeua9bjt1ewd4m6wf&st=e4j328ru&raw=1">
 </p>
 
 3. You can now open your Remote Access Tool from your inventory to verify your stash is added to the Remote Accesss Tool list. You can now view the contents of your stash directly from the Remote Access Tool without using your PDA. Since this is a new stash the stash is indeed empty.
 
 <p align="center">
-  <img width="426" height="240" src="https://www.dropbox.com/scl/fi/cjcwc9votj367za8jbn09/RAT_add_rename_05.jpg?rlkey=cnx8bbr4gqplobcwv5x5a41bd&st=0h5v5qra&raw=1">
+  <img width="426" height="240" src="https://www.dropbox.com/scl/fi/f24mta2zu8lizfndiglt5/RAT_ADD_05.jpg?rlkey=uia96vyq133itpwrhmqcz63w5&st=k6b6nzgz&raw=1">
 </p>
 
 4. To Rename a stash click the Rename button and a dialog box should open with the current name of your selected stash. After Confirming the new name you should see the list updated with the new name of your stash.
 
 <p align="center">
-  <img width="426" height="240" src="https://www.dropbox.com/scl/fi/dc9hybxl2w93as7antngb/RAT_add_rename_08.jpg?rlkey=hec9dmrzr7o817vqjvz22kcg4&st=ljmse9tp&raw=1">
-  <img width="426" height="240" src="https://www.dropbox.com/scl/fi/yh8spdt9yzuidngl9bhng/RAT_add_rename_09.jpg?rlkey=y2gedzhpehb5m38v6ryjyxv3a&st=m9ztrdv5&raw=1">
+  <img width="426" height="240" src="https://www.dropbox.com/scl/fi/tj3hqwkxr1xdzxidh2yez/RAT_ADD_06.jpg?rlkey=1j3wleeb5b8oi8k3cuzirfwxo&st=ldn2g7qg&raw=1">
+  <img width="426" height="240" src="https://www.dropbox.com/scl/fi/3p4j781o2ir1oirt0p56x/RAT_ADD_07.jpg?rlkey=u7r47fxx0ajtq6rekq5e22kb7&st=u7fjh55q&raw=1">
 </p>
 
 5. Your stash map spot will also be updated with the new stash name.
 
 <p align="center">
-  <img width="426" height="240" src="https://www.dropbox.com/scl/fi/ooc20nknxss2gbgci0ihn/RAT_add_rename_10.jpg?rlkey=p36e5cjfy0gt82mbg9zohmbjo&st=xmaxv0vb&raw=1">
+  <img width="426" height="240" src="https://www.dropbox.com/scl/fi/bqk1yz9778muxkwrx41pf/RAT_ADD_08.jpg?rlkey=0l4nm4r6pz95p6kf5vu0sy0no&st=pszpax0w&raw=1">
 </p>
 
 #### B. Preview stash contents using the Remote Access Tool
@@ -89,8 +91,8 @@ Stashes cannot be opened remotely during a blowout for balance and for safety re
 1. You can view the contents of your linked stashes without opening the stash. Viewing the stash contents does not consume Teleport artifact uses. Open your Remote Access Tool and select from the list of your linked stashes. After selecting the stash from the list a preview window should appear on the right displaying all the contents of your selected stash.
 
 <p align="center">
-  <img width="426" height="240" src="https://www.dropbox.com/scl/fi/3b6w3gixxroa4qgvdrt41/RAT_preview_01.jpg?rlkey=pmg40eigvteqj8l0uiw90zrky&st=kxg703rc&raw=1">
-  <img width="426" height="240" src="https://www.dropbox.com/scl/fi/kxvr8lcdxwnedpezdsiaq/RAT_preview_02.jpg?rlkey=8aa739zvit20koducmaq3811i&st=j29zdvw6&raw=1">
+  <img width="426" height="240" src="https://www.dropbox.com/scl/fi/9whozfh5vtjcg9zpzt42n/RAT_PREVIEW_01.jpg?rlkey=hmro2i56wqwof4mwjhkz0dndo&st=or2kdjdy&raw=1">
+  <img width="426" height="240" src="https://www.dropbox.com/scl/fi/x03uxdhnq66sf9k3uvrxc/RAT_PREVIEW_02.jpg?rlkey=2acgotdtc2el91sf5a9ywyewk&st=bicwavau&raw=1">
 </p>
 
 #### C. Searching for an item using Remote Access Tool
@@ -99,15 +101,15 @@ Stashes cannot be opened remotely during a blowout for balance and for safety re
 1. The Remote Access Tool has an in-built search function which allows you to search for an item from all of your linked stashes. Let's say you want to search for an item named dummy.
 
 <p align="center">
-  <img width="426" height="240" src="https://www.dropbox.com/scl/fi/oanl2zbzdpj8teedraktm/RAT_search_01.jpg?rlkey=m77y06q4lgt1casa3nsow99vu&st=uq9nn89w&raw=1">
-  <img width="426" height="240" src="https://www.dropbox.com/scl/fi/kpwwgboczdc4kosab95r4/RAT_search_02.jpg?rlkey=mrlhgfuocrna6tfbuzwxf396s&st=tf0shl2w&raw=1">
+  <img width="426" height="240" src="https://www.dropbox.com/scl/fi/y9ndfg66o3asn02ygwjb3/RAT_SEARCH_01.jpg?rlkey=yb1afw2yhyofgcn9kpq5ltpq6&st=tj1vt8rs&raw=1">
+  <img width="426" height="240" src="https://www.dropbox.com/scl/fi/vwfqmlzclb7uy23sdsm57/RAT_SEARCH_02.jpg?rlkey=1t7zcfa482itim9kgmfpahy58&st=7dn587dp&raw=1">
 </p>
 
 2. After clicking OK, you should get a preview window to the left showing you the results of all items matching the word 'dummy'.The Green text are the items from your search result and the yellow number is the total number of said item from all of your linked stashes. The following white text are the names of the stashes in which the item is stored and the quantity of said item.
 
 <p align="center">
-  <img width="426" height="240" src="https://www.dropbox.com/scl/fi/m7m1tufe60srtrw9pq3sw/RAT_search_03.jpg?rlkey=qy977ccnnj9k6k9e6rkqe7mke&st=oeh9i7ov&raw=1">
-  <img width="426" height="240" src="https://www.dropbox.com/scl/fi/olh2qryw3nc5bm5b3ipq4/RAT_search_04.jpg?rlkey=9qa4mklm48xl4gox5gdl3zclv&st=p6mv7fkf&raw=1">
+  <img width="426" height="240" src="https://www.dropbox.com/scl/fi/yxobsygcyjazefpx2ny3v/RAT_SEARCH_03.jpg?rlkey=aqsahzl286mgj3yftxtwkk595&st=onunzwuy&raw=1">
+  <img width="426" height="240" src="https://www.dropbox.com/scl/fi/26b2mccm29ukbhfw9k9ql/RAT_SEARCH_04.jpg?rlkey=lg85q0rdmozqoi8jlfkwe0ely&st=64phay7l&raw=1">
 </p>
 
 #### D. Removing Linked Stash from your Remote Access Tool
