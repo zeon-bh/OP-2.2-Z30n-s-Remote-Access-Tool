@@ -6,4 +6,4 @@
 --             = 3   Balanced (10 Uses per Teleport)}
 --             = 4   Hard (3 Uses per Teleport)}
 --             = 5   Nightmare (1 Use per Teleport)
-RAT_PRESET = 3
+ZSTASH_RAT_PRESET = 3

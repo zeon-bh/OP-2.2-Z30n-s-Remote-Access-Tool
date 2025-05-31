@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<string_table>
+	<!--Remote Access Tool-->
+	<string id="item_zstash_name">
+		<rus>Средство удаленного доступа</rus>
+		<eng>Remote Access Tool</eng>
+		<ukr>Засіб віддаленого доступу</ukr>
+		<fra>Outil d'accès à distance</fra>
+		<pln>Narzędzie zdalnego dostępu</pln>
+	</string>
+	<string id="item_zstash_desc">
+		<rus>Средство удаленного доступа может использоваться для открытия схронов игрока удаленно из любого места в Зоне.\n\n\n\n ПРИМЕЧАНИЕ: Чтобы получить доступ к вашему схрону, вы должны сначала добавить ваш схрон, открыв его физически. Это откроет диалоговое окно для ввода имени вашего схрона. Ввод пустого имени сохранит имя схрона на основе места, где он размещен. Нажав кнопку отмены, вы можете продолжать использовать схрон как обычно, не добавляя его в Средство удаленного доступа.</rus>
+		<eng>The Remote Access Tool [RAT] can be use to open the player stashes remotely from any location in the Zone.\n\n\n\n NOTE: To access your stash you must first add your stash by opening it physically. This will open the dialog box to enter your stash name. Entering an empty name will save the stash name based on the location it is placed in. By pressing the cancel button, you can continue to use the stash normally without adding it to the Remote Access Tool.</eng>
+		<ukr>Засіб віддаленого доступу може використовуватися для відкриття схованок гравця віддалено з будь-якого місця в Зоні.\n\n\n\nПРИМІТКА: Щоб отримати доступ до вашої схованки, ви повинні спочатку додати вашу схованку, відкривши її фізично. Це відкриє діалогове вікно для введення назви вашої схованки. Введення порожнього імені збереже назву схованки на основі місця, де вона розміщена. Натиснувши кнопку скасування, ви можете продовжувати використовувати схованку як зазвичай, не додаючи її до Засобу віддаленого доступу.</ukr>
+		<fra>L'Outil d'accès à distance peut être utilisé pour ouvrir les caches du joueur à distance depuis n'importe quel endroit dans la Zone.\n\n\n\nNOTE : Pour accéder à votre cache, vous devez d'abord ajouter votre cache en l'ouvrant physiquement. Cela ouvrira la boîte de dialogue pour saisir le nom de votre cache. La saisie d'un nom vide enregistrera le nom de la cache en fonction de l'endroit où elle est placée. En appuyant sur le bouton Annuler, vous pouvez continuer à utiliser la cache normalement sans l'ajouter à l'Outil d'accès à distance.</fra>
+		<pln>Narzędzie zdalnego dostępu może być używane do zdalnego otwierania skrytek gracza z dowolnej lokalizacji w Strefie.\n\n\n\nUWAGA: Aby uzyskać dostęp do swojej skrytki, musisz najpierw dodać swoją skrytkę, otwierając ją fizycznie. Otworzy to okno dialogowe do wprowadzenia nazwy skrytki. Wprowadzenie pustej nazwy zapisze nazwę skrytki na podstawie lokalizacji, w której jest umieszczona. Naciskając przycisk Anuluj, możesz nadal używać skrytki normalnie, nie dodając jej do Narzędzia zdalnego dostępu.</pln>
+	</string>
+	<!--Remote Access Tool SMS Messages-->
+		<string id="sms_zstash_label">
+		<rus>%c[sms_red]ИНСТРУМЕНТ УДАЛЕННОГО ДОСТУПА:%c[default]</rus>
+		<eng>%c[sms_red]REMOTE ACCESS TOOL:%c[default]</eng>
+		<ukr>%c[sms_red]ІНСТРУМЕНТ ВІДДАЛЕНОГО ДОСТУПУ:%c[default]</ukr>
+		<fra>%c[sms_red]OUTIL D'ACCÈS À DISTANCE:%c[default]</fra>
+		<pln>%c[sms_red]NARZĘDZIE ZDALNEGO DOSTĘPU:%c[default]</pln>
+	</string>
+	<string id="sms_zstash_stash_add">
+		<rus>добавлен в Инструмент удаленного доступа</rus>
+		<eng>has been added to the Remote Access Tool</eng>
+		<ukr>додано до Інструменту віддаленого доступу</ukr>
+		<fra>a été ajouté à l'Outil d'accès à distance</fra>
+		<pln>został dodany do Narzędzia zdalnego dostępu</pln>
+	</string>
+	<string id="sms_zstash_stash_unique">
+		<rus>Тайник с таким же именем уже добавлен в Инструмент удаленного доступа! Используйте уникальное имя для вашего тайника.</rus>
+		<eng>Stash with the same name already added to the Remote Access Tool! Use a unique name for your stash.</eng>
+		<ukr>Схованку з такою ж назвою вже додано до Інструменту віддаленого доступу! Використовуйте унікальну назву для своєї схованки.</ukr>
+		<fra>Une planque portant le même nom a déjà été ajoutée à l'Outil d'accès à distance ! Utilisez un nom unique pour votre planque.</fra>
+		<pln>Skrytka o tej samej nazwie została już dodana do Narzędzia zdalnego dostępu! Użyj unikalnej nazwy dla swojej skrytki.</pln>
+	</string>
+	<string id="sms_zstash_combat_rename">
+		<rus>Нельзя переименовать связанный тайник во время боя!</rus>
+		<eng>Cannot Rename the linked stash during combat!</eng>
+		<ukr>Неможливо перейменувати пов'язану схованку під час бою!</ukr>
+		<fra>Impossible de renommer la planque liée pendant un combat !</fra>
+		<pln>Nie można zmienić nazwy połączonej skrytki podczas walki!</pln>
+	</string>
+	<string id="sms_zstash_blowout">
+		<rus>Нельзя открыть удаленный тайник во время выброса!</rus>
+		<eng>Cannot open the remote stash during a blowout!</eng>
+		<ukr>Неможливо відкрити віддалену схованку під час викиду!</ukr>
+		<fra>Impossible d'ouvrir la planque distante pendant une émission !</fra>
+		<pln>Nie można otworzyć zdalnej skrytki podczas выброса!</pln>
+	</string>
+	<string id="sms_zstash_stolen">
+		<rus>Нельзя открыть удаленный тайник, ваш тайник был украден и недоступен до тех пор, пока не будет возвращен!</rus>
+		<eng>Cannot open the remote stash, Your Stash has been stolen and cannot be accessed until retrieved!</eng>
+		<ukr>Неможливо відкрити віддалену схованку, вашу схованку було вкрадено, і вона недоступна, доки її не буде повернуто!</ukr>
+		<fra>Impossible d'ouvrir la planque distante, votre planque a été volée et ne peut être consultée tant qu'elle n'a pas été récupérée !</fra>
+		<pln>Nie można otworzyć zdalnej skrytki, Twoja skrytka została skradziona i nie można uzyskać do niej dostępu, dopóki nie zostanie odzyskana!</pln>
+	</string>
+	<string id="sms_zstash_combat_open">
+		<rus>Нельзя открыть удаленный тайник во время боя!</rus>
+		<eng>Cannot open the remote stash during combat!</eng>
+		<ukr>Неможливо відкрити віддалену схованку під час бою!</ukr>
+		<fra>Impossible d'ouvrir la planque distante pendant un combat !</fra>
+		<pln>Nie można otworzyć zdalnej skrytki podczas walki!</pln>
+	</string>
+	<string id="sms_zstash_no_teleport">
+		<rus>Нельзя открыть удаленный связанный тайник, в инвентаре нет доступных артефактов телепортации!</rus>
+		<eng>Cannot open the remote linked stash, no available teleport artifacts in the inventory!</eng>
+		<ukr>Неможливо відкрити віддалену пов'язану схованку, в інвентарі немає доступних артефактів телепортації!</ukr>
+		<fra>Impossible d'ouvrir la planque distante liée, aucun artefact de téléportation disponible dans l'inventaire !</fra>
+		<pln>Nie można otworzyć zdalnej połączonej skrytki, brak dostępnych artefaktów teleportacji w ekwipunku!</pln>
+	</string>
+	<string id="sms_zstash_teleport_condition">
+		<rus>Нельзя открыть удаленный тайник, доступные артефакты телепортации не имеют достаточного заряда для открытия удаленного соединения со связанным тайником!</rus>
+		<eng>Cannot open the remote stash, The available Teleport Artifacts do not have sufficient charge to open a remote connection to the linked stash!</eng>
+		<ukr>Неможливо відкрити віддалену схованку, доступні артефакти телепортації не мають достатнього заряду для відкриття віддаленого з'єднання з пов'язаною схованкою!</ukr>
+		<fra>Impossible d'ouvrir la planque distante, les artefacts de téléportation disponibles n'ont pas une charge suffisante pour ouvrir une connexion à distance vers la planque liée !</fra>
+		<pln>Nie można otworzyć zdalnej skrytki, dostępne artefakty teleportacji nie mają wystarczającego ładunku, aby otworzyć zdalne połączenie z połączoną skrytką!</pln>
+	</string>
+	<string id="sms_zstash_spawned">
+		<rus>Инструмент удаленного доступа добавлен в ваш инвентарь!!!</rus>
+		<eng>Remote Access Tool has been added to your inventory!!!</eng>
+		<ukr>Інструмент віддаленого доступу додано до вашого інвентарю!!!</ukr>
+		<fra>L'Outil d'accès à distance a été ajouté à votre inventaire !!!</fra>
+		<pln>Narzędzie zdalnego dostępu zostało dodane do twojego ekwipunku!!!</pln>
+	</string>
+	<!--Remote Access Tool UI Text-->
+	<string id="ui_zstash_linked_stashes">
+		<rus>Связанные тайники</rus>
+		<eng>Linked Stashes</eng>
+		<ukr>Пов'язані схованки</ukr>
+		<fra>Planques liées</fra>
+		<pln>Połączone skrytki</pln>
+	</string>
+	<string id="ui_zstash_rename_stash">
+		<rus>Переименовать тайник</rus>
+		<eng>Rename Stash</eng>
+		<ukr>Перейменувати схованку</ukr>
+		<fra>Renommer la planque</fra>
+		<pln>Zmień nazwę skrytki</pln>
+	</string>
+	<string id="ui_zstash_open_stash">
+		<rus>Открыть тайник</rus>
+		<eng>Open Stash</eng>
+		<ukr>Відкрити схованку</ukr>
+		<fra>Ouvrir la planque</fra>
+		<pln>Otwórz skrytkę</pln>
+	</string>
+	<string id="ui_zstash_linked_contents">
+		<rus>Содержимое связанного тайника</rus>
+		<eng>Linked Stash Contents</eng>
+		<ukr>Вміст пов'язаної схованки</ukr>
+		<fra>Contenu de la planque liée</fra>
+		<pln>Zawartość połączonej skrytki</pln>
+	</string>
+	<string id="ui_zstash_search_dialog">
+		<rus>Поиск предмета в ваших связанных тайниках:</rus>
+		<eng>Search for an item in your linked stashes:</eng>
+		<ukr>Пошук предмета у ваших пов'язаних схованках:</ukr>
+		<fra>Rechercher un objet dans vos planques liées :</fra>
+		<pln>Wyszukaj przedmiot w swoich połączonych skrytkach:</pln>
+	</string>
+	<string id="ui_zstash_search_caption">
+		<rus>Результаты поиска для</rus>
+		<eng>Search Results for</eng>
+		<ukr>Результати пошуку для</ukr>
+		<fra>Résultats de la recherche pour</fra>
+		<pln>Wyniki wyszukiwania dla</pln>
+	</string>
+	<string id="ui_zstash_teleport_uses">
+		<rus>Использований телепорта:</rus>
+		<eng>Teleport Uses:</eng>
+		<ukr>Використань телепорту:</ukr>
+		<fra>Utilisations du téléporteur:</fra>
+		<pln>Użycia teleportu:</pln>
+	</string>
+	<string id="ui_zstash_preview_invalid">
+		<rus>Ошибка: ID тайника не найден для предварительного просмотра.</rus>
+		<eng>Error: Stash ID not found for preview.</eng>
+		<ukr>Помилка: ID схованки не знайдено для попереднього перегляду.</ukr>
+		<fra>Erreur : ID de la planque non trouvé pour l'aperçu.</fra>
+		<pln>Błąd: Nie znaleziono ID skrytki do podglądu.</pln>
+	</string>
+	<string id="ui_zstash_search_dialog">
+		<rus>Поиск предмета в связанных тайниках:</rus>
+		<eng>Search for an item in the Linked Stashes:</eng>
+		<ukr>Пошук предмета у пов'язаних схованках:</ukr>
+		<fra>Rechercher un objet dans les planques liées :</fra>
+		<pln>Wyszukaj przedmiot w połączonych skrytkach:</pln>
+	</string>
+	<string id="ui_zstash_rename_dialog">
+		<rus>Переименовать связанный тайник</rus>
+		<eng>Rename the linked stash</eng>
+		<ukr>Перейменувати пов'язану схованку</ukr>
+		<fra>Renommer la planque liée</fra>
+		<pln>Zmień nazwę połączonej skrytki</pln>
+	</string>
+	<string id="ui_zstash_add_dialog">
+		<rus>Инструмент удаленного доступа [Задать имя тайника и связать]:</rus>
+		<eng>Remote Access Tool [Set Stash Name and Link]:</eng>
+		<ukr>Інструмент віддаленого доступу [Встановити назву схованки та зв'язати]:</ukr>
+		<fra>Outil d'accès à distance [Définir le nom de la planque et lier] :</fra>
+		<pln>Narzędzie zdalnego dostępu [Ustaw nazwę skrytki i połącz]:</pln>
+	</string>
+	<string id="ui_zstash_stash_empty">
+		<rus>Удаленный связанный тайник пуст!</rus>
+		<eng>Remote Linked Stash is Empty!</eng>
+		<ukr>Віддалена пов'язана схованка порожня!</ukr>
+		<fra>La planque distante liée est vide !</fra>
+		<pln>Zdalna połączona skrytka jest pusta!</pln>
+	</string>
+	<string id="ui_zstash_search_empty">
+		<rus>не найден в ваших связанных тайниках!</rus>
+		<eng>not found in your linked stashes!</eng>
+		<ukr>не знайдено у ваших пов'язаних схованках!</ukr>
+		<fra>introuvable dans vos planques liées !</fra>
+		<pln>nie znaleziono w twoich połączonych skrytkach!</pln>
+	</string>
+	<string id="ui_zstash_take_all">
+		<rus>Вы не можете удалить тайник удаленно с помощью Инструмента удаленного доступа!</rus>
+		<eng>You cannot remove the stash remotely using the Remote Access Tool!</eng>
+		<ukr>Ви не можете видалити схованку віддалено за допомогою Інструменту віддаленого доступу!</ukr>
+		<fra>Vous ne pouvez pas supprimer la planque à distance à l'aide de l'Outil d'accès à distance !</fra>
+		<pln>Nie możesz usunąć skrytki zdalnie za pomocą Narzędzia zdalnego dostępu!</pln>
+	</string>
+	<string id="ui_zstash_ui_change">
+		<rus>Вы не можете изменить интерфейс тайника удаленно с помощью Инструмента удаленного доступа!</rus>
+		<eng>You cannot change the stash UI Remotely using the Remote Access Tool!</eng>
+		<ukr>Ви не можете змінити інтерфейс схованки віддалено за допомогою Інструменту віддаленого доступу!</ukr>
+		<fra>Vous ne pouvez pas modifier l'interface utilisateur de la planque à distance à l'aide de l'Outil d'accès à distance !</fra>
+		<pln>Nie możesz zmieniać interfejsu użytkownika skrytki zdalnie za pomocą Narzędzia zdalnego dostępu!</pln>
+	</string>
+	<string id="ui_zstash_link_mapspot">
+		<rus>ТАЙНИК СВЯЗАН С ИНСТРУМЕНТОМ УДАЛЕННОГО ДОСТУПА</rus>
+		<eng>STASH LINKED WITH REMOTE ACCESS TOOL</eng>
+		<ukr>СХОВАНКА ПОВ'ЯЗАНА З ІНСТРУМЕНТОМ ВІДДАЛЕНОГО ДОСТУПУ</ukr>
+		<fra>PLANQUE LIÉE AVEC L'OUTIL D'ACCÈS À DISTANCE</fra>
+		<pln>SKRYTKA POŁĄCZONA Z NARZĘDZIEM ZDALNEGO DOSTĘPU</pln>
+	</string>
+</string_table>

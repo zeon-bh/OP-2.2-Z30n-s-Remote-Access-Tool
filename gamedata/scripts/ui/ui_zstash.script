@@ -13,7 +13,7 @@ local Preset_setting = {
 	[4] = 33,
 	[5] = 99
 }
-local DEPLETE_RATE = Preset_setting[zstash_configs.RAT_PRESET] or 10 -- Defaults to balanced rate
+local DEPLETE_RATE = Preset_setting[zstash_configs.ZSTASH_RAT_PRESET] or 10 -- Defaults to balanced rate
 local TELEPORT_SAFETY_THRESHOLD = 1 -- Limit at which Teleport artifacts cannot be used for opening remote stashes
 
 class "StashData" (CUIListItemEx)

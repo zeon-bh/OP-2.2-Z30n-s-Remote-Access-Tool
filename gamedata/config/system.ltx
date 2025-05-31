@@ -1,0 +1,415 @@
+#include "defines.ltx"
+#include "languages.ltx"
+#include "misc\items.ltx"
+#include "misc\aem_items.ltx"
+#include "misc\doc_view.ltx"
+#include "misc\stco.ltx"
+#include "prefetch\prefetch.ltx"
+#include "weathers\environment.ltx"
+#include "creatures\monsters.ltx"
+#include "creatures\stalkers.ltx"
+#include "weapons\weapons.ltx"
+#include "misc\arc.ltx"
+#include "misc\monster_items.ltx"
+
+#include "creatures\actor.ltx"
+
+#include "misc\zones.ltx"
+#include "misc\postprocess.ltx"
+
+#include "misc\artefacts.ltx"
+#include "misc\embrions.ltx"
+#include "misc\devices.ltx"
+#include "misc\quest_items.ltx"
+#include "misc\arhara_items.ltx"
+#include "misc\imitators.ltx"
+#include "misc\outfit.ltx"
+#include "misc\effectors.ltx"
+#include "creatures\helicopter.ltx"
+#include "creatures\mi6.ltx"
+#include "creatures\spirit_steam.ltx"
+#include "external.ltx"
+#include "capture.ltx"
+
+; ����������
+#include "misc\nano_items.ltx"
+#include "creatures\vol_spawn.ltx"
+#include "misc\nano_tele.ltx"
+
+; ������������
+#include "creatures\valerich_spawn_sections.ltx"
+#include "misc\artefacts_amkzp.ltx"
+
+#include "misc\OGG_player.ltx"
+#include "creatures\game_relations.ltx"
+#include "creatures\vechicles.ltx"
+
+; ����������� ������� ����� ������� � ��������, ��� ����� ���� ���-�� ���������
+#include "mp\weapons_mp\ammo_mp.ltx"
+#include "mp\weapons_mp\weapons_mp.ltx"
+#include "mp\mp_ranks.ltx"
+
+#include "evaluation.ltx"
+#include "fonts.ltx"
+
+#include "alife.ltx"
+#include "creatures\spawn_sections.ltx"
+#include "creatures\spawn_sections_snp.ltx"
+
+; AEM
+#include "creatures\aem_monsters.ltx"
+#include "creatures\aem_stalkers.ltx"
+#include "quick_slots\main.ltx"
+
+[sound]
+occlusion_scale = 0.4
+snd_collide_min_volume=0.1
+snd_collide_max_volume=200.
+
+[demo_record]
+speed0    = 0.3
+speed1    = 3.0
+speed2    = 15.0
+speed3    = 60.0
+ang_speed0  = 0.1
+ang_speed1  = 0.5
+ang_speed2  = 1.0
+ang_speed3  = 2.0
+
+[string_table]
+language	= ;rus
+font_prefix	= ;_cent ;_west
+;������ xml ������, ���������� ������� ��������
+files = articles, ui, dialog_manager, cycle_task, treasure, encyclopedia, items, artefacts, outfit, dialogs_treasure, stories, weapons, devices, amk, sak_strings, sak_trade, sak_treasure, dialogs_amk, dialogs_new, wawka, arsenal_mod, aem, arhara, dialogs_arhara, upgrade, collector, dialogs_buusty, dialogs_snp, volazar, oksana579, dialogs_oksana579, sms_oksana_spawn, sms_arhara_dialog, sms_buusty_dialog, sms_fly, sms_kostya_dialog, sms_other, sms_character_name, sms_name, sms_surname, sms_pogon, sms_dolg, sms_freedom, sms_modders, sms_modders2, sms_uniq, sms_uniq2, sms_snp, tasks_akill, archievements, kontroller_diary, tips, storyline, docs_biznes_treasure, storyline_tasks, mapspots, generate_fnames, generate_snames, questman, statistic, storyline_dialogs, version, news,tasks_volazar, sms_battle,tasks_new, tasks_buusty, tasks_snp,tasks_general, sms_akill,tasks_kostya,tasks_arhara,tasks_oksana579,monolith_talk,zstash_ui_msg
+
+[texture_desc]
+files = ui_icons_map, ui_common, ui_old_textures, ui_ingame, ui_mainmenu, ui_statistics, ui_hud, ui_numpad, ui_inventory, ui_inventory2, ui_iconstotal, ui_iconstotal2, ui_pda, ui_icons_npc, ui_npc_monster, ui_npc_unique, ui_npc_unique_2, ui_buy_menu, ui_asus_intro, aem_ui_npc, ui_arhara_unique, amk_pda, amk_pda_blank, ui_npc_snp, ui_npc_chess
+
+[info_portions]
+;������ xml ������, ���������� info_portions
+files = info_encyclopedia, info_storyline, info_aem, info_new, info_wawka, info_arhara, info_buusty, info_volazar, info_oksana579, info_v92
+
+[encyclopedia]
+files = archievements, articles, encyclopedia
+
+[dialogs]
+files = dialogs, dialogs_storyline, dialogs_escape, dialogs_bar, dialogs_military, dialogs_kostya, dialogs_amk, dialogs_new, dialogs_wawka, dialogs_arhara, dialogs_buusty, dialogs_snp, dialogs_volazar, dialogs_oksana579
+
+[profiles]
+;������ xml ������, ���������� ������� ��������� � ���������
+files =  npc_profile, npc_profile_new, npc_profile_v92
+
+;������ xml ������, ���������� �������� ���������� ��������� � ���������
+specific_characters_files = characters_simulation, characters_storyline, characters_amk, characters_new, characters_aem, characters_arhara, characters_buusty, characters_snp, characters_volazar, characters_chess, characters_v92
+
+[artefacts_tasks]
+;��� ���������� �������, ������� ���������� ��� ��������
+;������ ����������
+script_func = ;trader_job.artefacts_task_list_text
+
+[game_tasks]
+files = game_tasks
+
+[explosion_marks]
+wallmarks     = wm\wm_grenade
+dist        = 0.5 ;2.4  ;
+size        = 0.6 ;0.4  ;
+max_count     = 5
+
+[bloody_marks]
+wallmarks       = wm\wm_blood_1,wm\wm_blood_2,wm\wm_blood_3,wm\wm_blood_4,wm\wm_blood_5,wm\wm_blood_6,wm\wm_blood_7,wm\wm_blood_8,wm\wm_blood_9
+dist            = 5.0   ;2.4  ;(�) max ���������� ������ �����
+max_size        = 0.4   ;0.3  ;(�)������ ����� ��� ���� ����� nominal hit �� �������� ������� (�� ���������� *0.5)
+min_size        = 0.12        ;(�)����������� ������ �����
+nominal_hit     = 0.35        ;�������� ������������ ����, ��� ������� ����������� �������� ����� (max_size)
+
+;����� �����
+blood_drops     = wm\wm_blood_drop_1,wm\wm_blood_drop_2,wm\wm_blood_drop_3,wm\wm_blood_drop_4
+start_blood_size  = 0.6     ;������ ���� ���� ������ ������ �����
+stop_blood_size   = 0.15     ;������ ���� ���� ����� ������������ (������ ���� ������ start_blood_size)
+
+blood_drop_time     = 0.1     ;OBSOLETE
+blood_drop_time_min = 0.3     ;
+blood_drop_time_max = 2.0     ;
+blood_drop_size     = 0.1     ;������ ����� (�) �����, ������� �����
+
+[entity_fire_particles]
+fire_particles = damage_fx\burn_creatures
+start_burn_size = 0.0003    ;������ ����� ����� �������� ������ ������ �������� ����
+stop_burn_size  = 0.0001    ;������ ����� ����� �������� ���������� ��������
+min_burn_time = 10000   ;����������� ����� �������� ��������� (���� ���� ���� ��� ������)
+
+[hud_cursor]
+;��� ������� � ��������� �� ����� ������
+cross_length    = 0.004         ;����� "�������" �������
+min_radius      = 0.0         ;����������� ������ ������� (��� ������� ���������)
+max_radius      = 0.4         ;������������ ������
+radius_lerp_speed = 0.08          ;�������� ������������ ��������� �������
+cross_color     = 0.7,0.7,0.7,1.0   ;���� �������
+;disp_scale      = 0.04          ;������� ������� (������������ ������) - ������ �������� ����� �� ������������
+
+[hud_hitmark]
+hit_mark_texture = ui\ui_hud_hit_mark
+;ui\ui_hud_hit_mark
+;ui\ui_hud_hit_mark_01
+;ui\ui_hud_hit_mark_02
+;ui\ui_hud_hit_mark_03
+;ui\ui_hud_hit_mark_04
+;ui\ui_hud_hit_mark_05
+;ui\ui_hud_hit_mark_06
+;ui\ui_hud_hit_mark_07
+;ui\ui_hud_hit_mark_08
+;ui\ui_hud_hit_mark_09
+;ui\ui_hud_hit_mark_10
+;ui\ui_hud_hit_mark_11
+;ui\ui_hud_hit_mark_12
+;ui\ui_hud_hit_mark_13
+;ui\ui_hud_hit_mark_14
+;ui\ui_hud_hit_mark_15
+;ui\ui_hud_hit_mark_16
+;ui\ui_hud_hit_mark_17
+;ui\ui_hud_hit_mark_18
+
+[actor_firsteye_cam]
+lim_pitch                = -1.5, 1.5
+lim_yaw                  = 0, 0
+rot_speed                = 3.14, 3.14, 0
+
+[actor_ladder_cam]
+lim_pitch                = -1.5, 1.5
+lim_yaw                  = -1.0, 1.0
+rot_speed                = 3.14, 3.14, 0
+
+[actor_free_cam]
+lim_pitch                = -1.5, 1.5
+lim_yaw                  = 0, 0
+lim_zoom                 = 0.4, 10
+rot_speed                = 3.14, 1.0, 10
+ 
+[actor_look_cam]
+lim_pitch                = -0.7, 1
+lim_yaw                  = 0, 0
+lim_zoom                 = 1, 5
+rot_speed                = 3.14, 6.28, 10
+
+[actor_look_cam_psp]
+lim_pitch                = -0.7, 1
+lim_yaw                  = 0, 0
+lim_zoom                 = 1, 5
+rot_speed                = 2, 2, 2
+offset          = 0.4,0.2,-1.1
+autoaim_speed_y     = 0.5, 3.14    ;min,max speed
+autoaim_speed_x     = 0.5, 3.14
+
+[mounted_weapon_cam]
+lim_pitch                = -0.5, 0.5
+lim_yaw                  = -2.0, 2.0
+rot_speed                = 3.14, 1.0, 0
+
+[car_firsteye_cam]
+lim_pitch                = -0.5, 0.3
+lim_yaw                  = -2.0, 2.0
+rot_speed                = 3.14, 1.0, 0
+ 
+[car_free_cam]
+lim_pitch                = -1, 1.56 ;0, 1.56
+lim_yaw                  = 0, 0 ;0, 0
+lim_zoom                 = 1, 10 ;1, 7
+rot_speed                = 3.14, 1.0, 10 ;3.14, 1.0, 10
+
+[car_look_cam]
+lim_pitch                = 0, 1.56
+lim_yaw                  = 0  , 0
+lim_zoom                 = 1, 7
+rot_speed                = 25, 1.0, 10
+
+[heli_free_cam]
+lim_pitch                = -1.5, 1.5
+lim_yaw                  = 0, 0
+lim_zoom                 = 5, 25
+rot_speed                = 3.14, 1.0, 10
+ 
+[heli_front_cam]
+;lim_yaw    = -0.01,0.01
+lim_pitch                = -1.2, 1.2
+lim_yaw                  = -1.5, 1.5
+rot_speed                = 3.14, 1.5, 0
+ 
+[heli_look_cam]
+lim_pitch                = 0, 1.56
+lim_yaw                  = 0, 0
+lim_zoom                 = 5, 15
+rot_speed                = 3.14, 1.0, 10
+ 
+[interface]
+font_game                = font_game
+font_small               = font_small
+
+[trade]
+;������������ ��������� ���� ��� �������� � ����������� �� ��������� � ���������
+;������� ��������������� ����� ����������
+buy_price_factor_hostile  = 0.05   ;����������� ������� ��� goodwill = -100
+buy_price_factor_friendly = 0.1   ;����������� ������� ��� goodwill = 100
+sell_price_factor_hostile = 3    ;����������� ������� ��� goodwill = -100
+sell_price_factor_friendly  = 2  ;����������� ������� ��� goodwill = 100
+
+
+[inventory]
+bolt_allowed_sections=bolt,gilza, bolt_m1,bolt_m2
+take_dist   = 2
+max_weight    = 80
+max_ruck    = 56
+max_belt    = 14
+
+slot_persistent_1  = false   	;knife    0
+slot_persistent_2  = false    	;pistol 1
+slot_persistent_3  = false   	;rifle  2
+slot_persistent_4  = true   	;grenades 3
+slot_persistent_5  = false   	;apparatus  4
+slot_persistent_6  = true   	;bolt 5
+slot_persistent_7  = false    	;outfit 6
+slot_persistent_8  = true   	;pda  7
+slot_persistent_9  = false   	;detector_arts 8
+slot_persistent_10  = true      ;torch  9
+slot_persistent_11  = true      ;artefact  10
+slot_persistent_12  = false     ;detector_anoms  11
+slot_persistent_13  = false     ;pnv  12
+slot_persistent_14  = false     ;shotgun  13
+slot_persistent_15  = false     ;biodev  14
+
+default_container_size = 50 	;items
+
+
+[physics]
+object_damage_factor    = 1.2f
+
+; ���������� ����
+[stalker_names_stalker]
+name_cnt    = 102
+last_name_cnt = 599
+
+[stalker_names_bandit]
+name_cnt    = 36
+last_name_cnt = 180
+
+[stalker_names_science]
+name_cnt    = 14
+last_name_cnt = 27
+
+[stalker_names_private]
+name_cnt    = 1
+last_name_cnt = 200
+
+[stalker_names_sergeant]
+name_cnt    = 1
+last_name_cnt = 200
+
+[stalker_names_lieutenant]
+name_cnt    = 1
+last_name_cnt = 200
+
+[stalker_names_captain]
+name_cnt    = 1
+last_name_cnt = 200
+
+[stalker_names_naemnik]
+name_cnt    = 50
+last_name_cnt = 50
+
+[stalker_names_girls]
+name_cnt    = 61
+last_name_cnt = 241
+
+[stalker_names_vermaht]
+name_cnt    = 39
+last_name_cnt = 45
+
+;��������� ����������� �������� ��������� PDA � ������� ����
+[maingame_ui]
+pda_msgs_max_show_time = 20000
+info_msgs_max_show_time = 10000
+snd_new_contact         = detectors\contact_1
+snd_new_contact1        = detectors\contact_8
+on_ui_show_prop_box		= callback_ui.show_prop_box
+on_cell_after_select	= callback_ui.on_cell_after_select
+on_cell_item_drop		= callback_ui.on_cell_item_drop
+on_item_place_change	= callback_ui.on_item_place_change
+
+[main_ingame_indicators_thresholds]
+radiation       = 0.1,0.25,0.4,0.55,0.7
+wounds          = 0.01,0.2,0.4,0.6,0.8
+jammed          = 0.4,0.6,0.7,0.8,0.9
+starvation      = 0.5,0.6,0.7,0.8,0.9
+fatigue         = 0.3,0.6,0.7,0.8,0.9
+weight			= 100.0,103.0,105.0,107.0 ;������� ������� � ��������� ��� ����������� �������� ���� � �������������
+exo_charge 		= 0.8,0.84,0.88,0.92,0.96
+
+
+[tutorial_conditions_thresholds]
+max_power       = 0.75
+power         = 0.1
+bleeding        = 0.4
+satiety         = 0.5
+radiation       = 0.1
+weapon_jammed     = 0.9
+psy_health        = 0.5
+
+[squad_manager]
+schedule_min      =   1
+schedule_max      = 999
+
+[agent_manager]
+schedule_min      = 100
+schedule_max      = 1000
+
+[script]
+current_server_entity_version = 7
+
+[collision_damage]
+bonce_damage_factor_for_objects = 1.
+
+[pkm_visual_memory]
+min_view_distance       = 1 ;0.4        ; �����������, �����v� ������� �� eye_range, � ����������� �� ����
+max_view_distance       = 1 ;0.8        ; �����������, �����v� ������� �� eye_range, � ����������� �� ����
+visibility_threshold    = 50 ;150.0       ; ��������, ��� ���������� ������ �������� ������ �������� �����v�
+always_visible_distance   = 1 ;0.1
+time_quant          = 0.00001
+decrease_value        = 0.1       ; ��������, �� ������� ���������� ���, ���� ������ ����� � �������, �� ����� �� �����-�� ��������
+velocity_factor         = 0.5
+luminocity_factor     = 0.5       ; ������ ���� ��� (������ �� L����)
+transparency_threshold    = 0.4       ;
+view_fov_deg        = 90
+view_aspect         = 1
+view_far_plane        = 100
+
+[details]
+swing_normal_amp1 = .1
+swing_normal_amp2 = .05
+swing_normal_rot1 = 30.0
+swing_normal_rot2 = 1.0
+swing_normal_speed  = 2.0
+;fast
+swing_fast_amp1   = 0.35;0.25
+swing_fast_amp2   = .20;0.15
+swing_fast_rot1   = 5
+swing_fast_rot2   = .5;0.75
+swing_fast_speed  = 0.5;1
+
+[allowed_param_names]
+pause_on_load
+pause_on_load_call_sound
+death_counter
+user_name
+new_sms
+autochange_difficulty
+autosave_enable
+ext_animations
+fast_respawn
+respawn_type
+buy_item
+invalid_objects
+amk_option_hud
+amk_option_mus
+horror_time_enable
+dynamic_anoms
+

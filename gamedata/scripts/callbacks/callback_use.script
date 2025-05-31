@@ -165,12 +165,7 @@ local object_sections={
 			transmutator.amkEnableDevice()
 		end
 	},
-	["sh_remnabor"]={
-		func=function(object)
-			sh_remnabor.EnableDevice(1)
-		end
-	},
-		["vodka"]={
+	["vodka"]={
 		func=function(object)
 			amk_alcohol.drink_vodka(object)
 			_G.Dream:vodka()
@@ -194,7 +189,7 @@ local object_sections={
 				voice(sound_file):play(db.actor, 0, sound_object.s2d)
 				return
 			end
-			local allow_sleep=true
+			local allow_sleep=false
 			local hides = amk_hideouts.hide[level.name()]
 			if hides then
 				for _,hide in ipairs(hides) do
@@ -214,6 +209,7 @@ local object_sections={
 				amk_hideouts.pda_show_hideouts(true)
 				sms("%c[sender]"..translate("name_istochnik_neizvesten")..":\\n%c[sms_red]"..translate("dream_cant_sleep_here"), 0, "nodata", 0, nil, nil)
 				timer("run", 20.0, "amk_hideouts.pda_hide_hideouts()")				
+				
 			end
 		end
 	},
@@ -226,7 +222,7 @@ local object_sections={
 		func=function(object)
 			level.start_stop_menu(ui_zstash.ZStashMenu(), true)
 		end
-	},	
+	},
 	["strelok_turret"]={
 		func=function(object)
 			place_strelok_turret(object)

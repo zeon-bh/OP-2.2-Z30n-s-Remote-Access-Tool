@@ -83,7 +83,7 @@ local keys={
 		},
 		[DIK_keys.DIK_SEMICOLON]={
 			func=function(key,action)
-				if shift_state then
+				if zstash_logic and shift_state then
 					local spawn_item = "zstash"
 					local zstash_exists = false
 					db.actor:iterate_ruck(function(item)

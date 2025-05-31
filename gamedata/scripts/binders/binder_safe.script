@@ -132,7 +132,9 @@ function SafeBinder:use_callback(obj, who)
 			end
 		end
 		-- Remote Access Tool - add rucksack to the device if present in player's inventory
-		if zstash_logic.CheckZStashTool(self) then return end -- Exit out of call back after open UI text dialog
+		if zstash_logic then
+			if zstash_logic.CheckZStashTool(self) then return end -- Exit out of call back after open UI text dialog
+		end
 		level.start_stop_menu(storageViewer,true)
 	end
 end
