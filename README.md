@@ -1,5 +1,5 @@
 
-# Z30n's Remote Access Tool (v1.2)
+# Z30n's Remote Access Tool (v1.2.1)
 
 A small mod for Stalker OP-2.2 or Cumulative Pack 2.2 that allows a player to access,view and search items in player created stashes remotely from any map in the zone using a simple GUI Interface. The GUI has support for English, Russian, Ukranian, French and Polish languages.
 
@@ -7,10 +7,11 @@ A small mod for Stalker OP-2.2 or Cumulative Pack 2.2 that allows a player to ac
 
 **DISCLAIMER:** ALWAYS MAKE BACKUPS OF YOUR SAVE FILES AND GAMEDATA FOLDER(IF YOU HAVE PREVIOUSLY INSTALLED SOME MODS). THIS GAME IS NOTORIOUS FOR BREAKING YOUR SAVE FOR RANDOM REASONS, ESPECIALLY IF YOU ARE MODDING. YOU HAVE BEEN WARNED!!!
 
+The Mod is safe to install in a new game or a pre-existing save file. Removing it mid playthrough is not recommended and will break your save file!!!
+
 1. Download the zip file from the Github Repository.
 2. Extract the files to your OP-2.2 game directory.
-3. After extracting the zip files you should have a gamedata folder and an fsgame.ltx file (If you do not have any mods installed previously) inside your OP-2.2 installed directory.
-4. The zip file includes anti-cheat disable.
+3. After extracting the zip files you should have a gamedata folder inside your OP-2.2 installed directory.
 
 ## File Conflicts
 If you have any other previous mods installed in your OP-2.2 game directory, make sure to check which files are over written by this mod.
@@ -21,18 +22,20 @@ The files that MUST be overwritten are:
     2. callback_use.script
     3. key_handlers.script
     4. portable_charger.ltx
+    5. System.ltx
 
 **THESE FILES SHOULD ABSOLUTELY MUST BE OVERWRITTEN OR THE MOD WILL NOT WORK!!!**
 
 If you are using custom icons then you can ignore ui_icon_equipment.dds, but doing so will display a broken or missing icon for the Remote Access Tool. Other than the missing icon the item should work as intended.
 
-If you have installed the OP-2.2 English and Russian translation mod by StormTetris:
-https://github.com/StormTetris/English-Ukrainian-OP2.2/tree/main  
-You do not have to worry about the .xml files being overwritten. In this case the files are:  
+If you are already using a modified System.ltx file and don't want to overwrite it, Find the line with the text [string_table]:
 
-    1. items.xml
-    2. sms_other.xml
-    3. ui.xml
+    [string_table]
+    language	=
+    font_prefix	=
+    files = articles, ui, dialog_manager, cycle_task, treasure, ..... zstash_ui_msg
+
+In the files section add zstash_ui_msg at the end and you are done.
 
 ## Remote Access Tool
 To obtain the Remote Access Tool simply press **LEFT SHIFT + SEMICOLON(;)** to spawn the Remote Access Tool into your inventory. You should get a popup message.
@@ -43,7 +46,7 @@ Opening the stashes using the Remote Access Tool requires you to have a Teleport
 
 The Teleport uses can be changed in the zstash_configs.script file. You can set your prefered preset value.
 
-Stolen Stashes cannot be opened with the Remote Access Tool. You must be retrieve the stolen stash to get access to the stash remotely.
+Stolen Stashes cannot be opened with the Remote Access Tool. You must retrieve the stolen stash to get access to the stash remotely.
 
 Stashes cannot be opened remotely during a blowout for balance and for safety reasons, to avoid data corruption on your save file.
 
@@ -113,5 +116,4 @@ Stashes cannot be opened remotely during a blowout for balance and for safety re
 
 ## Credits
 AMK Team, OP-2.2 or Cumulative Pack 2.2<br/>
-StormTetris, English-Ukrainian-OP2.2 Translation mod and anti-cheat disabler<br/>
 Translations done by Google Gemini 2.5 Pro Exp
