@@ -96,8 +96,13 @@ Stashes cannot be opened remotely during a blowout for balance and for safety re
 </p>
 
 #### C. Searching for an item using Remote Access Tool
-**As of v1.2 the search function only works properly if your game is running in English localization. Other localizations might have mixed or downright broken search results.**
+~~**As of v1.2 the search function only works properly if your game is running in English localization. Other localizations might have mixed or downright broken search results.**~~<br/>
+**(Update v1.2.1) The search now works for both English and Russian Localization. For other languages, there is no option to input their respective text into the search box as this is an engine limitation and cannot be fixed with mods. Apologize for the inconvenience :(**
 
+You can change the input language by pressing the text EN/RU located at the right end of the text box.
+<p align="center">
+  <img width="288" height="82" src="https://www.dropbox.com/scl/fi/sju7zsb7kggdwnkluolbc/RAT_RU_SEARCH.PNG?rlkey=oavqifgmnpfx8er3sdwqfl4uq&st=4vgu8si3&raw=1">
+</p>
 1. The Remote Access Tool has an in-built search function which allows you to search for an item from all of your linked stashes. Let's say you want to search for an item named dummy.
 
 <p align="center">
