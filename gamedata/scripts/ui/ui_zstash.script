@@ -383,6 +383,7 @@ function ZStashMenu:on_rename()
 	if db.actor:enemy_see_actor() then
         sms(translate("sms_zstash_label").." "..translate("sms_zstash_combat_rename"), nil, "nano", 5000)
 		self:on_quit()
+		return
 	end
 
 	-- Rename the stash
@@ -433,6 +434,7 @@ function ZStashMenu:on_ok()
 	if db.actor:enemy_see_actor() then
         sms(translate("sms_zstash_label").." "..translate("sms_zstash_combat_open"), nil, "nano", 5000)
 		self:on_quit()
+		return
 	end
 
 	if table.size(self.teleport_artifacts.teleport) == 0 then
