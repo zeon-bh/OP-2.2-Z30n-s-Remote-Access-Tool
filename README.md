@@ -1,5 +1,5 @@
 
-# Z30n's Remote Access Tool (v1.2.1)
+# Z30n's Remote Access Tool (v1.3)
 
 A small mod for Stalker OP-2.2 or Cumulative Pack 2.2 that allows a player to access,view and search items in player created stashes remotely from any map in the zone using a simple GUI Interface. The GUI has support for English, Russian, Ukranian, French and Polish languages.
 
@@ -42,11 +42,17 @@ To obtain the Remote Access Tool simply press **LEFT SHIFT + SEMICOLON(;)** to s
 
 Once you have obtained the Remote Access tool, you need to first add your stashes to the Remote Accesss Tool list to open them remotely.
 
-Opening the stashes using the Remote Access Tool requires you to have a Teleport Artefact with enough minimum condition. The Teleport Uses in the top right indicates how many times you can open your stash remotely. By default a single Teleport artifact has around ~10 uses.
+v1.3 Remote Access Tool :
+Opening the stashes using the Remote Access Tool requires you to have one of the following electric type artifacts:  
 
-The Teleport uses can be changed in the zstash_configs.script file. You can set your prefered preset value.
+    - Sparkler - 3 Uses
+    - Flash - 10 Uses
+    - Moonlight - 25 Uses
+    - Battery - 50 Uses
 
-**Used Teleport Artifacts can still be used by the Handheld Universal Teleporter!**
+The number indicates how many times an artifact can be used to open a stash remotely. After using all the charges, the artifact will be removed from your inventory. If you have multiple different valid artifacts in your inventory, the artifact with the highest remaining uses will be prioritized first.
+
+The artifact uses can be changed in the zstash_configs.script file by changing the value of ZSTASH_RAT_MULT variable. The number is a multiplier, For Eg. setting the value to 2, doubles the default artifact uses and so on.
 
 Stolen Stashes cannot be opened with the Remote Access Tool. You must retrieve the stolen stash to get access to the stash remotely.
 
@@ -96,8 +102,7 @@ Stashes cannot be opened remotely during a blowout for balance and for safety re
 </p>
 
 #### C. Searching for an item using Remote Access Tool
-~~**As of v1.2 the search function only works properly if your game is running in English localization. Other localizations might have mixed or downright broken search results.**~~<br/>
-**(Update v1.2.1) The search now works for both English and Russian Localization. For other languages, there is no option to input their respective text into the search box as this is an engine limitation and cannot be fixed with mods. Apologize for the inconvenience :(**
+**(Update v1.3) The search works for both English and Russian Localization. For other languages, there is no option to input their respective text into the search box as this is an engine limitation and cannot be fixed with mods. Apologize for the inconvenience :(**
 
 You can change the input language by pressing the text EN/RU located at the right end of the text box.
 <p align="center">
