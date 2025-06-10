@@ -65,19 +65,12 @@
 		<fra>Impossible d'ouvrir la planque distante pendant un combat !</fra>
 		<pln>Nie można otworzyć zdalnej skrytki podczas walki!</pln>
 	</string>
-	<string id="sms_zstash_no_teleport">
-		<rus>Нельзя открыть удаленный связанный тайник, в инвентаре нет доступных артефактов телепортации!</rus>
-		<eng>Cannot open the remote linked stash, no available teleport artifacts in the inventory!</eng>
-		<ukr>Неможливо відкрити віддалену пов'язану схованку, в інвентарі немає доступних артефактів телепортації!</ukr>
-		<fra>Impossible d'ouvrir la planque distante liée, aucun artefact de téléportation disponible dans l'inventaire !</fra>
-		<pln>Nie można otworzyć zdalnej połączonej skrytki, brak dostępnych artefaktów teleportacji w ekwipunku!</pln>
-	</string>
-	<string id="sms_zstash_teleport_condition">
-		<rus>Нельзя открыть удаленный тайник, доступные артефакты телепортации не имеют достаточного заряда для открытия удаленного соединения со связанным тайником!</rus>
-		<eng>Cannot open the remote stash, The available Teleport Artifacts do not have sufficient charge to open a remote connection to the linked stash!</eng>
-		<ukr>Неможливо відкрити віддалену схованку, доступні артефакти телепортації не мають достатнього заряду для відкриття віддаленого з'єднання з пов'язаною схованкою!</ukr>
-		<fra>Impossible d'ouvrir la planque distante, les artefacts de téléportation disponibles n'ont pas une charge suffisante pour ouvrir une connexion à distance vers la planque liée !</fra>
-		<pln>Nie można otworzyć zdalnej skrytki, dostępne artefakty teleportacji nie mają wystarczającego ładunku, aby otworzyć zdalne połączenie z połączoną skrytką!</pln>
+	<string id="sms_zstash_no_artifact">
+		<rus>Невозможно открыть удаленный связанный тайник, нет доступных артефактов в инвентаре!</rus>
+		<eng>Cannot open the remote linked stash, no available artifacts in the inventory!</eng>
+		<ukr>Неможливо відкрити віддалений пов'язаний сховок, немає доступних артефактів в інвентарі!</ukr>
+		<fra>Impossible d'ouvrir la cache liée distante, aucun artefact disponible dans l'inventaire !</fra>
+		<pln>Nie można otworzyć zdalnego połączonego schowka, brak dostępnych artefaktów w ekwipunku!</pln>
 	</string>
 	<string id="sms_zstash_spawned">
 		<rus>Инструмент удаленного доступа добавлен в ваш инвентарь!!!</rus>
@@ -129,12 +122,12 @@
 		<fra>Résultats de la recherche pour</fra>
 		<pln>Wyniki wyszukiwania dla</pln>
 	</string>
-	<string id="ui_zstash_teleport_uses">
-		<rus>Использований телепорта:</rus>
-		<eng>Teleport Uses:</eng>
-		<ukr>Використань телепорту:</ukr>
-		<fra>Utilisations du téléporteur:</fra>
-		<pln>Użycia teleportu:</pln>
+	<string id="ui_zstash_artifact_uses">
+		<rus>Использования артефакта:</rus>
+		<eng>Artifact Uses:</eng>
+		<ukr>Використання артефакту:</ukr>
+		<fra>Utilisations de l'artefact :</fra>
+		<pln>Użycia artefaktu:</pln>
 	</string>
 	<string id="ui_zstash_preview_invalid">
 		<rus>Ошибка: ID тайника не найден для предварительного просмотра.</rus>

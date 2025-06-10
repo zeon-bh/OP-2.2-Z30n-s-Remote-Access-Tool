@@ -1,8 +1,9 @@
--- Z Stash Util Functions and definitions
+--- Author : Z30n_bh
+--- Z Stash Util Functions and definitions
 local original_StorageViewer_CloseViewer = nil
 local original_UiViewer_CloseViewer = nil
 working_zstash_id = nil
-local debug = false
+local debug = true
 
 local function CreateStashEntry(name, id)
     return {
@@ -115,7 +116,7 @@ function SpawnZStashDevice()
 	end)
 	if not zstash_exists then
 		create(spawn_item,db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id(), db.actor:id())
-		create("af_teleport",db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id(), db.actor:id())
+		create("af_electra_moonlight",db.actor:position(), db.actor:level_vertex_id(), db.actor:game_vertex_id(), db.actor:id())
 		sms(translate("sms_zstash_label").." "..translate("sms_zstash_spawned"), nil, "nano", 7500)
 	end
 end
@@ -130,7 +131,7 @@ function AddZStashName(stash_binder, entered_name, confirmed)
 		debug_log("Adding Stash...")
 		local name_to_save = string.trim(entered_name) -- Trim whitespace
 		if name_to_save == "" then
-			name_to_save = level.name() .. " - " .. new_zstash_id -- Default if empty
+			name_to_save = translate(level.name()) .. " - " .. new_zstash_id -- Default if empty
 		end
 
 		local stash_list = table.load("zstash_linked_stashes") or {} -- Ensure it's a table
@@ -269,8 +270,11 @@ function FindItemInTable(zstash_name, search_string, str_table, case_insensitive
             end
         end
     end
-	for k,v in pairs(matches) do
-		debug_log("FindItemInTable() : Item_Key = %s | stash_name = %s | count = %d", k, v.stash_name, v.count)
+
+	if IsDebug() then
+		for k,v in pairs(matches) do
+			debug_log("FindItemInTable() : Item_Key = %s | stash_name = %s | count = %d", k, v.stash_name, v.count)
+		end
 	end
 
     return matches
@@ -283,7 +287,7 @@ function FindItemLinkedStashes(zstash_menu, linked_zstashes, item_to_search)
 
 	for _,zstash in pairs(linked_zstashes) do
 		local storage_id_key = "storage_" .. zstash.stash_id
-    	local stash_data = table.deep_copy(keyvals("storages"):get(storage_id_key, nil))
+		local stash_data = keyvals("storages"):get(storage_id_key, nil)
 		local item_data_table = {}
 
 		-- Skip Empty or Invalid Linked Stashes

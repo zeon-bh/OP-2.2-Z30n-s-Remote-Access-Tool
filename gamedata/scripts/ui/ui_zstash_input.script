@@ -1,3 +1,5 @@
+--- Author : Z30n_bh
+
 ------ Text Box CUI class ------
 
 class "ZStashInputDialog" (CUIScriptWnd)

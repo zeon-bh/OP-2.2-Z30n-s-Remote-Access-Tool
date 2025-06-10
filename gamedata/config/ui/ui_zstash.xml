@@ -12,13 +12,13 @@
 			<text font="graffiti22" r="238" g="153" b="26">ui_zstash_linked_stashes</text>
 		</msg1>
 
-		<tele_uses x="215" y="40" width="150" height="25">
+		<artifact_uses x="215" y="40" width="150" height="25">
 			<text font="graffiti22" r="238" g="153" b="26" complex_mode="1" align="r" vert_align="t"/>
-		</tele_uses>
+		</artifact_uses>
 
-		<tele_num x="367" y="40" width="50" height="25">
+		<artifact_num x="367" y="40" width="50" height="25">
 			<text font="graffiti22" complex_mode="1" align="l" vert_align="t"/>
-		</tele_num>
+		</artifact_num>
 
 		<list_frame x="63" y="60" width="332" height="378" stretch="1">
 			<texture>ui_tablist_textbox</texture>

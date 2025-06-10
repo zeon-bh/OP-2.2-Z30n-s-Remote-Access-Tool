@@ -1,20 +1,17 @@
+--- Author : Z30n_bh
 --- Remote Access Tool Main UI Script
 
 local def_color={255,216,186,140}
 local sel_color={255,0,150,100}
 local cur_color={255,255,0,0}
 
--- Remote Access Tool Teleport Uses preset
-local Preset_setting = {
-	[0] = 0.99,
-	[1] = 1.98,
-	[2] = 3.96,
-	[3] = 9.9,
-	[4] = 33,
-	[5] = 99
+-- Remote Access Tool Artifact Depletion Rates
+local RAT_ARTIFACTS = {
+	["af_electra_sparkler"] = 33,
+	["af_electra_flash"] = 10,
+	["af_electra_moonlight"] = 4,
+	["af_dummy_battery"] = 2
 }
-local DEPLETE_RATE = Preset_setting[zstash_configs.ZSTASH_RAT_PRESET] or 10 -- Defaults to balanced rate
-local TELEPORT_SAFETY_THRESHOLD = 1 -- Limit at which Teleport artifacts cannot be used for opening remote stashes
 
 class "StashData" (CUIListItemEx)
 
@@ -43,8 +40,8 @@ function ZStashMenu:__init() super()
 	self:InitStashList()
 	self:FillList()
 	self.last_select_item = nil
-	self.teleport_artifacts = nil
-	self:InitTeleport()
+	self.zstash_artifacts = nil
+	self:InitArtifacts()
 end
 
 function ZStashMenu:InitControls()
@@ -58,10 +55,10 @@ function ZStashMenu:InitControls()
 	xml:InitStatic("main_dialog:capt", self.dialog)
 	xml:InitStatic("main_dialog:msg1", self.dialog)
 
-	-- Teleport Uses
-	self.tele_uses = xml:InitStatic("main_dialog:tele_uses", self.dialog)
-	self.tele_uses:SetText(translate("ui_zstash_teleport_uses"))
-	self.tele_num = xml:InitStatic("main_dialog:tele_num", self.dialog)
+	-- Artifact Uses
+	self.artifact_uses = xml:InitStatic("main_dialog:artifact_uses", self.dialog)
+	self.artifact_uses:SetText(translate("ui_zstash_artifact_uses"))
+	self.artifact_num = xml:InitStatic("main_dialog:artifact_num", self.dialog)
 
 	-- Preview list window
 	self.stash_preview_panel = xml:InitFrame("stash_preview_panel", self)
@@ -437,25 +434,26 @@ function ZStashMenu:on_ok()
 		return
 	end
 
-	if table.size(self.teleport_artifacts.teleport) == 0 then
-		-- No teleport artifacts in inventory
-        sms(translate("sms_zstash_label").." "..translate("sms_zstash_no_teleport"), nil, "nano", 5000)
+	if table.size(self.zstash_artifacts.artifacts) == 0 then
+		-- No artifacts in inventory
+        sms(translate("sms_zstash_label").." "..translate("sms_zstash_no_artifact"), nil, "nano", 5000)
 		self:on_quit()
 	else
-		if self.teleport_artifacts.selected_artifact then
-			local artifact_obj = self.teleport_artifacts.selected_artifact.obj
+		local artifact_obj = self.zstash_artifacts.selected_artifact.art
 
-			-- Set the new Teleport artifact condition after use
-			local art_update_cond = (artifact_obj:condition() - (DEPLETE_RATE * 0.01)) or 0.01
-			artifact_obj:set_condition(art_update_cond)
-			-- Start the remote stash session
-			self:on_quit()
-			zstash_remote_manager.OpenRemoteStashView(item.sid)
-		else
-			-- Teleport Artefacts have no charge left
-			sms(translate("sms_zstash_label").." "..translate("sms_zstash_teleport_condition"), nil, "nano", 5000)
-			self:on_quit()
+		-- Set the new artifact condition after use
+		local art_depletion_rate = RAT_ARTIFACTS[artifact_obj:section()] / zstash_configs.ZSTASH_RAT_MULT
+		local art_update_cond = (artifact_obj:condition() - (art_depletion_rate * 0.01)) or 0
+		artifact_obj:set_condition(art_update_cond)
+
+		-- Check if artifact has enough uses left else remove the artifact from player inventory
+		if artifact_obj:condition() < (art_depletion_rate * 0.01) then
+			release(artifact_obj)
 		end
+
+		-- Start the remote stash session
+		self:on_quit()
+		zstash_remote_manager.OpenRemoteStashView(item.sid)
 	end
 end
 
@@ -476,55 +474,60 @@ function ZStashMenu:UpdateList()
 	self:FillList() -- Refresh the stash list window
 end
 
--- Check if a Teleport Artifact is present and select one with the lowest condition and condition > charge requirement
-function ZStashMenu:InitTeleport()
-	local teleport_artifacts = {
+
+function ZStashMenu:InitArtifacts()
+	local zstash_artifacts = {
 		selected_artifact = nil,
-		teleport = {}
+		artifacts = {}
 	}
-	-- Convert teleport artifact condition charge to uses and use it directly to calculate total uses with safety threshold
+
+	-- Get the valid artifacts from the player inventory
 	db.actor:iterate_ruck(function(item)
 		if item then
-			if item:section() == "af_teleport" then
-				table.insert(teleport_artifacts.teleport, {uid = item:id(), uses = math.floor((item:condition() * 100) / DEPLETE_RATE), obj = item})
+			if RAT_ARTIFACTS[item:section()] then
+				local art_depletion_rate = RAT_ARTIFACTS[item:section()] 
+				table.insert(zstash_artifacts.artifacts, {art = item, art_uses = math.floor( ((item:condition() * 100) / art_depletion_rate) * zstash_configs.ZSTASH_RAT_MULT )})
 			end
 		end
 	end)
 
-	-- Sort table from least to maximum uses
-	table.sort(teleport_artifacts.teleport, function (a,b)
-			return a.uses < b.uses
+	-- Sort table from maximum to minimum uses
+	table.sort(zstash_artifacts.artifacts, function (a,b)
+			return a.art_uses > b.art_uses
 	end)
 
 
-	for _,v in pairs(teleport_artifacts.teleport) do
-		zstash_logic.debug_log("SORTED TABLE | Teleport UID = %d | Teleport Uses = %.2f", v.uid, v.uses)
-	end
-
-	-- Select the teleport artifact with lowest uses greater than TELEPORT_THRESHOLD and calculate total uses
-	local total_uses = 0
-	for _,art in pairs(teleport_artifacts.teleport) do
-		if art.uses >= 1 and not teleport_artifacts.selected_artifact then -- If current artifact is depleted skip to next one
-			teleport_artifacts.selected_artifact = art
-			zstash_logic.debug_log("SELECTED ARTIFACT | UID = %d | USES = %d", art.uid, art.uses)
+	if zstash_logic.IsDebug() then
+		for _,v in pairs(zstash_artifacts.artifacts) do
+			zstash_logic.debug_log("SORTED TABLE | Artifact Name = %s | Artifact UID = %d | Artifact Uses = %.2f", v.art:section(), v.art:id(), v.art_uses)
 		end
-		total_uses = total_uses + art.uses
 	end
 
-	-- Set the header text in the menu to display teleport artifact total uses if available
-	local getTeleportText = function()
+	-- Select the artifact with highest uses and calculate total uses
+	local total_uses = 0
+	for _,item in pairs(zstash_artifacts.artifacts) do
+		if item.art_uses >= 1 and not zstash_artifacts.selected_artifact then -- If current artifact is depleted skip to next one
+			zstash_artifacts.selected_artifact = item
+			zstash_logic.debug_log("SELECTED ARTIFACT : Artifact Name = %s | UID = %d | USES = %d", item.art:section(), item.art:id(), item.art_uses)
+		end
+		total_uses = total_uses + item.art_uses
+	end
+
+	-- Set the header text in the menu to display the artifact total uses if available
+	local GetArtifactText = function()
 		local condition_num = ""
-		if table.size(teleport_artifacts.teleport) == 0 then
+		if table.size(zstash_artifacts.artifacts) == 0 then
 			local no_artifacts = "%c[0,255,0,1]N/A%c[default]" -- No Artifacts Available
 			condition_num = no_artifacts
 		else
-			local artifacts_num = table.size(teleport_artifacts.teleport)
-			local max_uses = math.floor(100 / DEPLETE_RATE) * artifacts_num
+			local artifacts_num = table.size(zstash_artifacts.artifacts)
+			local max_uses = 0
 			local total_uses = 0
-			for _,art in ipairs(teleport_artifacts.teleport) do
-				total_uses = total_uses + art.uses
+			for _,v in ipairs(zstash_artifacts.artifacts) do
+				max_uses = max_uses + math.floor(100 / RAT_ARTIFACTS[v.art:section()]) * zstash_configs.ZSTASH_RAT_MULT
+				total_uses = total_uses + v.art_uses
 			end
-			local green_channel = 255 * (total_uses/max_uses)
+			local green_channel = 255 * (total_uses / max_uses)
 			local red_channel = 255 - green_channel
 			local color_code = string.format("[0,%d,%d,1]", red_channel,green_channel)
 			condition_num = string.format("%%c%s%d%%c[default]", color_code, total_uses)
@@ -533,8 +536,8 @@ function ZStashMenu:InitTeleport()
     end
 
 	-- Display the total uses if availabe or N/A
-	self.tele_num:SetText(getTeleportText())
-	self.teleport_artifacts = teleport_artifacts
+	self.artifact_num:SetText(GetArtifactText())
+	self.zstash_artifacts = zstash_artifacts
 end
 
 -- Display the search results
@@ -547,8 +550,11 @@ function ZStashMenu:SearchResult(search_item, search_results)
 			table.insert(keys,key)
 		end
 		table.sort(keys) -- Sort the key values inside the keys table in alpha ascending
-		for _,v in ipairs(keys) do
-			zstash_logic.debug_log("SearchResult() : Keys = %s", v)
+
+		if zstash_logic.IsDebug() then
+			for _,v in ipairs(keys) do
+				zstash_logic.debug_log("SearchResult() : Keys = %s", v)
+			end
 		end
 
 		for _,item_key in ipairs(keys) do

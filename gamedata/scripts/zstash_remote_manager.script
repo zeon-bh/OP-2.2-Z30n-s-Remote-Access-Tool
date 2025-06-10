@@ -1,3 +1,5 @@
+--- Author : Z30n_bh
+--- Remote Access Tool storage viewer patching script
 
 RemoteStashManager = {}
 
